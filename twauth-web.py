@@ -5,15 +5,17 @@ import urllib.request
 import urllib.parse
 import urllib.error
 import json
+import logging
 
 app = Flask(__name__)
 
-app.debug = False
+#app.debug = True
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
 authorize_url = 'https://api.twitter.com/oauth/authorize'
 show_user_url = 'https://api.twitter.com/1.1/users/show.json'
+search_tweets_url = "https://api.twitter.com/1.1/search/tweets.json"
 
 # Support keys from environment vars (Heroku).
 app.config['APP_CONSUMER_KEY'] = os.getenv(
@@ -118,21 +120,77 @@ def callback():
 
     response = json.loads(real_content.decode('utf-8'))
 
-    friends_count = response['friends_count']
-    statuses_count = response['statuses_count']
-    followers_count = response['followers_count']
-    name = response['name']
+    q = '%23GodOfWar'
+    count = "5"
+    get_url = 'https://api.twitter.com/1.1/search/tweets.json?q=%23GodOfWar&result_type=mixed&count=10'#search_tweets_url + '?q=' + q+ '&count=' + count
+    # Call https://api.twitter.com/1.1/search/tweets.json
+    real_token = oauth.Token(real_oauth_token, real_oauth_token_secret)
+    real_client = oauth.Client(consumer, real_token)
+    real_resp, real_content = real_client.request(get_url, "GET")
+
+    if real_resp['status'] != '200':
+        error_message = "Invalid response from Twitter API GET search/tweets: {status}".format(
+            status=real_resp['status'])
+        return render_template('error.html', error_message=error_message)
+
+
+    media = get_hashtag_media(real_content)
+    my_json = json.dumps(media, cls=SetEncoder)
+    response = json.loads(real_content.decode('utf-8'))
+
+
+    friends_count = 0#response['friends_count']
+    statuses_count = 0#response['statuses_count']
+    followers_count = 0#response['followers_count']
+    name = ''#response['name']
+    images_count = len(media)
 
     # don't keep this token and secret in memory any longer
     del oauth_store[oauth_token]
 
     return render_template('callback-success.html', screen_name=screen_name, user_id=user_id, name=name,
-                           friends_count=friends_count, statuses_count=statuses_count, followers_count=followers_count, access_token_url=access_token_url)
+                           friends_count=friends_count, statuses_count=statuses_count, followers_count=followers_count, access_token_url=access_token_url, images_count=images_count, images=media)
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('error.html', error_message='uncaught exception'), 500
+
+
+def get_hashtag_media(response):
+    tweets = json.loads(response)
+    media_files = set()
+    for status in tweets["statuses"]:
+        # print("Status: %s" % status)
+        if("media" in status["entities"]):
+            media = status["entities"].get('media', [])
+            if(len(media) > 0):
+                media_files.add(media[0]['media_url'])
+                print("Media: %s" % media[0]['media_url'])
+
+    return media_files
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
+# hashtag = the twitter tags to use
+# n = number of photos to retrieve
+def get_photos(oauth_key, oauth_sechashtags, n):
+    consumer_key = get_config("key")
+    consumer_secret = get_config("secret")
+
+    # Get the oauth tokens
+    o = authorize(consumer_key, consumer_secret)
+
+    response = search(o, hashtags, n)
+
+    # my_json = response.content.decode('utf8').replace("'", '"')
+    media = get_hashtag_media(response.content)
+    my_json = json.dumps(media, cls=SetEncoder)
+    return my_json
+
 
   
 if __name__ == '__main__':

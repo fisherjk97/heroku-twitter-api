@@ -6,12 +6,6 @@
 		screen_name }}</a>. We've successfully received your access token and confirmed it by retrieving some basic details
 	on your behalf from the Twitter API. Yay!</p>
 <p>Here is what we pulled from the API on your behalf:</p>
-<ul>
-	<li>You have Tweeted <span class="label label-success">{{ statuses_count }}</span> times.</li>
-	<li>You have <span class="label label-success">{{ followers_count }}</span> followers.</li>
-	<li>You follow <span class="label label-success">{{ friends_count }}</span> users.</li>
-	<li>You follow <span class="label label-success">{{ images_count }}</span> users.</li>
-</ul>
 {% for img in images %}
 	<img src={{img}} width='100%'/>
 {% endfor %}

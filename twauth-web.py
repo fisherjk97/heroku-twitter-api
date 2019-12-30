@@ -107,49 +107,25 @@ def callback():
     real_oauth_token_secret = access_token[b'oauth_token_secret'].decode(
         'utf-8')
 
-    # Call api.twitter.com/1.1/users/show.json?user_id={user_id}
-    real_token = oauth.Token(real_oauth_token, real_oauth_token_secret)
-    real_client = oauth.Client(consumer, real_token)
-    real_resp, real_content = real_client.request(
-        show_user_url + '?user_id=' + user_id, "GET")
-
-    if real_resp['status'] != '200':
-        error_message = "Invalid response from Twitter API GET users/show: {status}".format(
-            status=real_resp['status'])
-        return render_template('error.html', error_message=error_message)
-
-    response = json.loads(real_content.decode('utf-8'))
-
     q = '%23GodOfWar'
-    count = "5"
-    get_url = 'https://api.twitter.com/1.1/search/tweets.json?q=%23GodOfWar&result_type=mixed&count=10'#search_tweets_url + '?q=' + q+ '&count=' + count
-    # Call https://api.twitter.com/1.1/search/tweets.json
-    real_token = oauth.Token(real_oauth_token, real_oauth_token_secret)
-    real_client = oauth.Client(consumer, real_token)
-    real_resp, real_content = real_client.request(get_url, "GET")
+    count = '10'
+    user_content = get_user(real_oauth_token, real_oauth_token_secret, consumer, user_id)
+    user_response = to_json(user_content)
 
-    if real_resp['status'] != '200':
-        error_message = "Invalid response from Twitter API GET search/tweets: {status}".format(
-            status=real_resp['status'])
-        return render_template('error.html', error_message=error_message)
+    friends_count = user_response['friends_count']
+    statuses_count = user_response['statuses_count']
+    followers_count = user_response['followers_count']
+    name = user_response['name']
 
+    media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
 
-    media = get_hashtag_media(real_content)
-    my_json = json.dumps(media, cls=SetEncoder)
-    response = json.loads(real_content.decode('utf-8'))
+    media = get_hashtag_media(media_content)
 
-
-    friends_count = 0#response['friends_count']
-    statuses_count = 0#response['statuses_count']
-    followers_count = 0#response['followers_count']
-    name = ''#response['name']
-    images_count = len(media)
 
     # don't keep this token and secret in memory any longer
     del oauth_store[oauth_token]
 
-    return render_template('callback-success.html', screen_name=screen_name, user_id=user_id, name=name,
-                           friends_count=friends_count, statuses_count=statuses_count, followers_count=followers_count, access_token_url=access_token_url, images_count=images_count, images=media)
+    return render_template('callback-success.html', screen_name=screen_name, user_id=user_id,access_token_url=access_token_url, name=name,images=media)
 
 
 @app.errorhandler(500)
@@ -170,27 +146,31 @@ def get_hashtag_media(response):
 
     return media_files
 
-class SetEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, set):
-            return list(obj)
-        return json.JSONEncoder.default(self, obj)
-# hashtag = the twitter tags to use
-# n = number of photos to retrieve
-def get_photos(oauth_key, oauth_sechashtags, n):
-    consumer_key = get_config("key")
-    consumer_secret = get_config("secret")
 
-    # Get the oauth tokens
-    o = authorize(consumer_key, consumer_secret)
+def oauth_get(real_oauth_token, real_oauth_token_secret, consumer, request_url):
+    real_token = oauth.Token(real_oauth_token, real_oauth_token_secret)
+    real_client = oauth.Client(consumer, real_token)
+    real_resp, real_content = real_client.request(request_url, "GET")
 
-    response = search(o, hashtags, n)
 
-    # my_json = response.content.decode('utf8').replace("'", '"')
-    media = get_hashtag_media(response.content)
-    my_json = json.dumps(media, cls=SetEncoder)
-    return my_json
+    if real_resp['status'] != '200':
+        error_message = "Invalid response from Twitter API GET search/tweets: {status}".format(
+            status=real_resp['status'])
+        return render_template('error.html', error_message=error_message)
 
+    return real_content
+
+
+def search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count):
+    url = search_tweets_url +'?q='+q+'&count='+count
+    return oauth_get(real_oauth_token, real_oauth_token_secret, consumer, url)
+
+def get_user(real_oauth_token, real_oauth_token_secret, consumer, user_id):
+    url = show_user_url + '?user_id=' + user_id
+    return oauth_get(real_oauth_token, real_oauth_token_secret, consumer, url)
+
+def to_json(content):
+    return json.loads(content.decode('utf-8'))
 
   
 if __name__ == '__main__':

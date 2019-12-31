@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}success{% endblock %}
+{% block containercontent %}
+<h2>success</h2>
+<p>Here is what we pulled from the API on your behalf:</p>
+{% for img in images %}
+	<img src={{img}} width='100%'/>
+{% endfor %}
+{% endblock %}

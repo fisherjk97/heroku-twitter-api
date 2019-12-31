@@ -1,11 +1,13 @@
 import os
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for,jsonify, make_response
 import oauth2 as oauth
 import urllib.request
 import urllib.parse
 import urllib.error
 import json
-import logging
+import urllib.parse
+from flask_restful import Resource, Api
+
 
 app = Flask(__name__)
 
@@ -31,6 +33,27 @@ app.config.from_pyfile('config.cfg', silent=True)
 
 oauth_store = {}
 
+api = Api(app)
+
+class Twitter(Resource):
+    def get(self):
+        args = request.args
+        print (args) # For debugging
+        q = args['q']
+        count = args['count']
+        
+        q = '%23GodOfWar'
+        real_oauth_token = oauth_store['real_oauth_token']
+        real_oauth_token_secret = oauth_store['real_oauth_token_secret']
+        consumer = oauth_store['consumer']
+  
+        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
+
+        media = get_hashtag_media(media_content)
+        response = to_json(media)
+        return make_response(response, 200)
+
+api.add_resource(Twitter, '/twitter')
 
 @app.route('/')
 def hello():
@@ -104,8 +127,7 @@ def callback():
 
     # These are the tokens you would store long term, someplace safe
     real_oauth_token = access_token[b'oauth_token'].decode('utf-8')
-    real_oauth_token_secret = access_token[b'oauth_token_secret'].decode(
-        'utf-8')
+    real_oauth_token_secret = access_token[b'oauth_token_secret'].decode('utf-8')
 
     q = '%23GodOfWar'
     count = '10'
@@ -123,7 +145,11 @@ def callback():
 
 
     # don't keep this token and secret in memory any longer
-    del oauth_store[oauth_token]
+    #del oauth_store[oauth_token]
+    oauth_store['real_oauth_token'] = real_oauth_token
+    oauth_store['real_oauth_token_secret'] = real_oauth_token_secret
+    oauth_store['consumer'] = consumer
+
 
     return render_template('callback-success.html', screen_name=screen_name, user_id=user_id,access_token_url=access_token_url, name=name,images=media)
 

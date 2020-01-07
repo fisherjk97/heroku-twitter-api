@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, url_for,jsonify, make_response
+from flask import Flask, session, render_template, request, url_for,jsonify, make_response
 import oauth2 as oauth
 import urllib.request
 import urllib.parse
@@ -9,7 +9,7 @@ import urllib.parse
 from flask_restful import Resource, Api
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="", static_folder="static")
 
 #app.debug = True
 
@@ -55,6 +55,7 @@ class Twitter(Resource):
 
 api.add_resource(Twitter, '/twitter')
 
+   
 @app.route('/')
 def hello():
     return render_template('index.html')

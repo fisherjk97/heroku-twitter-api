@@ -1,12 +1,11 @@
-{% extends "base.html" %}
-{% block title %}success{% endblock %}
+{% block title %}{% endblock %}
 {% block containercontent %}
 <h3>Search for photos from Twitter</h3>
 <p>Documentation:
 	<a href="https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets">Twitter Dev - Search API</a>
 </p>
 <div >
-	<form method="POST" action="{{ url_for('twitter') }}">
+	<form method="POST" action="{{ url_for('callback') }}">
 		{{ form.csrf_token }}
 		<b>{{ form.hashtag.label }}</b> {{ form.hashtag(size=20) }}
 		<b>{{ form.count.label }}</b> {{ form.count(size=20) }}

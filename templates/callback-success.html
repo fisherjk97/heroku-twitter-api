@@ -1,15 +1,12 @@
 {% extends "base.html" %}
-{% block title %}success{% endblock %}
+{% block title %}{% endblock %}
 {% block containercontent %}
-<h2>success</h2>
-<p>Thank you, <strong>{{ name }}</strong>, for authorizing twauth-web an access token for <a href="https://twitter.com/{{ screen_name }}">@{{
+<p>Thank you for authorizing twauth-web an access token for <a href="https://twitter.com/">@{{
 		screen_name }}</a>. We've successfully received your access token and confirmed it by retrieving some basic details
 	on your behalf from the Twitter API. Yay!</p>
-<p>That's it, there's nothing left for you in this demo. Now, because this is a demo and we don't want to access your
-	data any longer, we've deleted our local copy of your token. You can be extra safe and revoke our token from your <a
-	 href="https://twitter.com/settings/applications">account settings</a> on Twitter.</p>
-<a href="/" class="btn btn-small btn-primary">Let me try again</a>
-<a href="{{ url_for('twitter') }}" class="btn btn-small btn-success">Search Tweet Photos</a>
+<a href="/" class="btn btn-small btn-primary">Let me authorize again</a>
+{% include 'twitter.html' %}
+
 <hr>
 <div class="bg-info" style="padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
 	<p><strong>What did we just do?</strong></p>

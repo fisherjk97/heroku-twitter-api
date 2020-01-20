@@ -12,6 +12,9 @@ Flask = "*"
 "Jinja2" = "*"
 MarkupSafe = "*"
 Werkzeug = "*"
+flask-restful = "*"
+wtforms = "*"
+urllib = "*"
 
 [dev-packages]
 

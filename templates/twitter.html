@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% block title %}success{% endblock %}
 {% block containercontent %}
-<h2>success</h2>
-<p>Here is what we pulled from the API on your behalf:</p>
+<h3>Search for photos from Twitter</h3>
+<p>Documentation:
+	<a href="https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets">Twitter Dev - Search API</a>
+</p>
 <div >
 	<form method="POST" action="{{ url_for('twitter') }}">
 		{{ form.csrf_token }}
-		{{ form.hashtag.label }} {{ form.hashtag(size=20) }}
-		{{ form.count.label }} {{ form.count(size=20) }}
-		<input type="submit" value="Search">
+		<b>{{ form.hashtag.label }}</b> {{ form.hashtag(size=20) }}
+		<b>{{ form.count.label }}</b> {{ form.count(size=20) }}
+		<input type="submit" value="Search" class="btn btn-small btn-success">
 	</form>
 </div>
 <div>
@@ -18,7 +20,8 @@
 </div>
 {% endfor %}
 </div>
-{% for img in images %}
-	<img src={{img}} width='100%'/>
-{% endfor %}
+	<p><b>{{message}}</b></p>
+	{% for img in images %}
+		<img src={{img}} width='100%'/>
+	{% endfor %}
 {% endblock %}

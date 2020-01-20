@@ -41,12 +41,15 @@ class TweetForm(Form):
    
 
 @app.route('/')
-def hello():
+def index():
+    #return redirect(url_for('start'))
     return render_template('index.html')
 
 class Consumer(object):
     def default(self, o):
             return o.__dict_
+
+
 
 @app.route('/start')
 def start():
@@ -135,14 +138,7 @@ def callback():
     session['real_oauth_token_secret'] = real_oauth_token_secret
     #session['consumer'] = consumer
 
-    return render_template('callback-success.html', screen_name=screen_name, user_id=user_id,access_token_url=access_token_url, name=name)
-
-@app.route('/submit', methods=('GET', 'POST'))
-def submit():
-    form = TweetForm()
-    if form.validate_on_submit():
-        return redirect('/index')
-    return render_template('callback-success.html', form=form)
+    return render_template('callback-success.html', screen_name=screen_name, user_id=user_id,access_token_url=access_token_url, name=name, form=TweetForm())
 
 
 @app.route('/twitter', methods=['GET', 'POST'])
@@ -159,9 +155,12 @@ def twitter():
         media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
 
         media = get_hashtag_media(media_content)
-        return render_template('twitter.html', images=media, form=form)
+        message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
+
+        return render_template('twitter.html', images=media, form=form, message=message)
     else:
         return render_template('twitter.html', form=form)
+   
    
 
 @app.errorhandler(500)

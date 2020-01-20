@@ -3,6 +3,21 @@
 {% block containercontent %}
 <h2>success</h2>
 <p>Here is what we pulled from the API on your behalf:</p>
+<div >
+	<form method="POST" action="{{ url_for('twitter') }}">
+		{{ form.csrf_token }}
+		{{ form.hashtag.label }} {{ form.hashtag(size=20) }}
+		{{ form.count.label }} {{ form.count(size=20) }}
+		<input type="submit" value="Search">
+	</form>
+</div>
+<div>
+	{% for field, errors in form.errors.items() %}
+<div class="alert alert-error">
+    {{ form[field].label }}: {{ ', '.join(errors) }}
+</div>
+{% endfor %}
+</div>
 {% for img in images %}
 	<img src={{img}} width='100%'/>
 {% endfor %}

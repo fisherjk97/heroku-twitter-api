@@ -5,15 +5,11 @@
 <p>Thank you, <strong>{{ name }}</strong>, for authorizing twauth-web an access token for <a href="https://twitter.com/{{ screen_name }}">@{{
 		screen_name }}</a>. We've successfully received your access token and confirmed it by retrieving some basic details
 	on your behalf from the Twitter API. Yay!</p>
-<p>Here is what we pulled from the API on your behalf:</p>
-{% for img in images %}
-	<img src={{img}} width='100%'/>
-{% endfor %}
 <p>That's it, there's nothing left for you in this demo. Now, because this is a demo and we don't want to access your
 	data any longer, we've deleted our local copy of your token. You can be extra safe and revoke our token from your <a
 	 href="https://twitter.com/settings/applications">account settings</a> on Twitter.</p>
 <a href="/" class="btn btn-small btn-primary">Let me try again</a>
-<a href="http://127.0.0.1:5000/twitter?q=%23GodOfWar&count=5">Submit?</a>
+<a href="{{ url_for('twitter') }}">Search Tweet Photos</a>
 <hr>
 <div class="bg-info" style="padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
 	<p><strong>What did we just do?</strong></p>
@@ -24,13 +20,5 @@
 				access_token_url }}</strong></a> endpoint with our application API key, API secret, the request token and the
 		oauth_verifier from the callback. That endpoint provided us with an access token that we could then store and use for
 		calling the APIs on your behalf.</p>
-</div>
-<div id="search_twitter">
-	<a href="/twitter" class="btn btn-small btn-primary">Search</a>
-
-</div>
-<div id="like_button_container">
-	<div class="btn btn-small btn-primary">Search</div>
-
 </div>
 {% endblock %}

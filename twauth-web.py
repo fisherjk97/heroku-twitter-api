@@ -1,16 +1,18 @@
 import os
-from flask import Flask, session, render_template, request, url_for,jsonify, make_response
+from flask import Flask, redirect, session, render_template, request, url_for,jsonify, make_response
 import oauth2 as oauth
 import urllib.request
 import urllib.parse
 import urllib.error
 import json
 import urllib.parse
+import urllib
 from flask_restful import Resource, Api
-
+from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
+from wtforms.validators import DataRequired, NumberRange
 
 app = Flask(__name__, static_url_path="", static_folder="static")
-
+app.secret_key = os.urandom(24)
 #app.debug = True
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'
@@ -33,33 +35,18 @@ app.config.from_pyfile('config.cfg', silent=True)
 
 oauth_store = {}
 
-api = Api(app)
-
-class Twitter(Resource):
-    def get(self):
-        args = request.args
-        print (args) # For debugging
-        q = args['q']
-        count = args['count']
-        
-        q = '%23GodOfWar'
-        real_oauth_token = oauth_store['real_oauth_token']
-        real_oauth_token_secret = oauth_store['real_oauth_token_secret']
-        consumer = oauth_store['consumer']
-  
-        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
-
-        media = get_hashtag_media(media_content)
-        response = to_json(media)
-        return make_response(response, 200)
-
-api.add_resource(Twitter, '/twitter')
-
+class TweetForm(Form):
+    hashtag  = TextField(u'Hashtag(s)', validators=[DataRequired()])
+    count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=20, message='Must be between 1 and 20')])
    
+
 @app.route('/')
 def hello():
     return render_template('index.html')
 
+class Consumer(object):
+    def default(self, o):
+            return o.__dict_
 
 @app.route('/start')
 def start():
@@ -87,7 +74,7 @@ def start():
     return render_template('start.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
 
-@app.route('/callback')
+@app.route('/callback', methods= ['GET', 'POST'])
 def callback():
     # Accept the callback params, get the token and call the API to
     # display the logged-in user's name and handle
@@ -130,8 +117,6 @@ def callback():
     real_oauth_token = access_token[b'oauth_token'].decode('utf-8')
     real_oauth_token_secret = access_token[b'oauth_token_secret'].decode('utf-8')
 
-    q = '%23GodOfWar'
-    count = '10'
     user_content = get_user(real_oauth_token, real_oauth_token_secret, consumer, user_id)
     user_response = to_json(user_content)
 
@@ -140,20 +125,44 @@ def callback():
     followers_count = user_response['followers_count']
     name = user_response['name']
 
-    media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
-
-    media = get_hashtag_media(media_content)
-
-
     # don't keep this token and secret in memory any longer
     #del oauth_store[oauth_token]
     oauth_store['real_oauth_token'] = real_oauth_token
     oauth_store['real_oauth_token_secret'] = real_oauth_token_secret
     oauth_store['consumer'] = consumer
 
+    session['real_oauth_token'] = real_oauth_token
+    session['real_oauth_token_secret'] = real_oauth_token_secret
+    #session['consumer'] = consumer
 
-    return render_template('callback-success.html', screen_name=screen_name, user_id=user_id,access_token_url=access_token_url, name=name,images=media)
+    return render_template('callback-success.html', screen_name=screen_name, user_id=user_id,access_token_url=access_token_url, name=name)
 
+@app.route('/submit', methods=('GET', 'POST'))
+def submit():
+    form = TweetForm()
+    if form.validate_on_submit():
+        return redirect('/index')
+    return render_template('callback-success.html', form=form)
+
+
+@app.route('/twitter', methods=['GET', 'POST'])
+def twitter():
+    form = TweetForm(request.form)
+    if request.method == 'POST' and form.validate():
+        q = form.hashtag.data
+        count = form.count.data
+
+        real_oauth_token = session['real_oauth_token']
+        real_oauth_token_secret = session['real_oauth_token_secret']
+        #consumer = session['consumer']
+        consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
+        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
+
+        media = get_hashtag_media(media_content)
+        return render_template('twitter.html', images=media, form=form)
+    else:
+        return render_template('twitter.html', form=form)
+   
 
 @app.errorhandler(500)
 def internal_server_error(e):
@@ -189,7 +198,11 @@ def oauth_get(real_oauth_token, real_oauth_token_secret, consumer, request_url):
 
 
 def search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count):
-    url = search_tweets_url +'?q='+q+'&count='+count
+    params = {'q': q, 'count': count}
+    encoded = urllib.parse.urlencode(params)
+    print(encoded)
+    url = search_tweets_url + '?' + encoded
+    print(url)
     return oauth_get(real_oauth_token, real_oauth_token_secret, consumer, url)
 
 def get_user(real_oauth_token, real_oauth_token_secret, consumer, user_id):
@@ -197,8 +210,15 @@ def get_user(real_oauth_token, real_oauth_token_secret, consumer, user_id):
     return oauth_get(real_oauth_token, real_oauth_token_secret, consumer, url)
 
 def to_json(content):
-    return json.loads(content.decode('utf-8'))
-
+    response = content
+    try:
+        response = content.decode('utf-8')
+    except:
+        print("Exception")
+    finally:
+        return json.loads(response)
   
+
+ 
 if __name__ == '__main__':
     app.run()

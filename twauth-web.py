@@ -10,8 +10,10 @@ import urllib
 from flask_restful import Resource, Api
 from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
 from wtforms.validators import DataRequired, NumberRange
+from flask_cors import CORS
 
 app = Flask(__name__, static_url_path="", static_folder="static")
+CORS(app)
 app.secret_key = os.urandom(24)
 #app.debug = True
 

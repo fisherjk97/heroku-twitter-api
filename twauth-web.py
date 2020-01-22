@@ -86,14 +86,13 @@ def callback():
 
         real_oauth_token = session['real_oauth_token']
         real_oauth_token_secret = session['real_oauth_token_secret']
-        #consumer = session['consumer']
-        consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
-        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
+
+        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
 
         media = get_hashtag_media(media_content)
         message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
         return render_template('callback-success.html', images=media, form=form, message=message)
-    else:
+    elif request.method == 'GET':
         # Accept the callback params, get the token and call the API to
         # display the logged-in user's name and handle
         oauth_token = request.args.get('oauth_token')
@@ -135,7 +134,7 @@ def callback():
         real_oauth_token = access_token[b'oauth_token'].decode('utf-8')
         real_oauth_token_secret = access_token[b'oauth_token_secret'].decode('utf-8')
 
-        user_content = get_user(real_oauth_token, real_oauth_token_secret, consumer, user_id)
+        user_content = get_user(real_oauth_token, real_oauth_token_secret, user_id)
         user_response = to_json(user_content)
 
         friends_count = user_response['friends_count']
@@ -144,10 +143,10 @@ def callback():
         name = user_response['name']
 
         # don't keep this token and secret in memory any longer
-        #del oauth_store[oauth_token]
-        oauth_store['real_oauth_token'] = real_oauth_token
-        oauth_store['real_oauth_token_secret'] = real_oauth_token_secret
-        oauth_store['consumer'] = consumer
+        del oauth_store[oauth_token]
+        #oauth_store['real_oauth_token'] = real_oauth_token
+        #oauth_store['real_oauth_token_secret'] = real_oauth_token_secret
+        #oauth_store['consumer'] = consumer
 
         session['real_oauth_token'] = real_oauth_token
         session['real_oauth_token_secret'] = real_oauth_token_secret
@@ -165,9 +164,8 @@ def twitter():
 
         real_oauth_token = session['real_oauth_token']
         real_oauth_token_secret = session['real_oauth_token_secret']
-        #consumer = session['consumer']
-        consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
-        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count)
+
+        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
 
         media = get_hashtag_media(media_content)
         message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
@@ -197,7 +195,9 @@ def get_hashtag_media(response):
     return media_files
 
 
-def oauth_get(real_oauth_token, real_oauth_token_secret, consumer, request_url):
+def oauth_get(real_oauth_token, real_oauth_token_secret, request_url):
+    consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
+
     real_token = oauth.Token(real_oauth_token, real_oauth_token_secret)
     real_client = oauth.Client(consumer, real_token)
     real_resp, real_content = real_client.request(request_url, "GET")
@@ -211,17 +211,17 @@ def oauth_get(real_oauth_token, real_oauth_token_secret, consumer, request_url):
     return real_content
 
 
-def search_tweets(real_oauth_token, real_oauth_token_secret, consumer, q, count):
+def search_tweets(real_oauth_token, real_oauth_token_secret, q, count):
     params = {'q': q, 'count': count}
     encoded = urllib.parse.urlencode(params)
     print(encoded)
     url = search_tweets_url + '?' + encoded
     print(url)
-    return oauth_get(real_oauth_token, real_oauth_token_secret, consumer, url)
+    return oauth_get(real_oauth_token, real_oauth_token_secret, url)
 
-def get_user(real_oauth_token, real_oauth_token_secret, consumer, user_id):
+def get_user(real_oauth_token, real_oauth_token_secret, user_id):
     url = show_user_url + '?user_id=' + user_id
-    return oauth_get(real_oauth_token, real_oauth_token_secret, consumer, url)
+    return oauth_get(real_oauth_token, real_oauth_token_secret, url)
 
 def to_json(content):
     response = content

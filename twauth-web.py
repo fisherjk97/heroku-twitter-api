@@ -8,13 +8,16 @@ import json
 import urllib.parse
 import urllib
 from flask_restful import Resource, Api
+from base64 import b64encode
 from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
 from wtforms.validators import DataRequired, NumberRange
 from flask_cors import CORS
 
 app = Flask(__name__, static_url_path="", static_folder="static")
-app.secret_key = os.urandom(24)
-app.config['SESSION_TYPE'] = 'filesystem'
+
+random_bytes = os.urandom(64)
+secret = b64encode(random_bytes).decode('utf-8')
+app.secret_key = secret
 
 CORS(app)
 #app.debug = True

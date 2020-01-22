@@ -15,7 +15,6 @@ Werkzeug = "*"
 flask-restful = "*"
 wtforms = "*"
 flask-cors = "*"
-b64encode = "*"
 
 [dev-packages]
 

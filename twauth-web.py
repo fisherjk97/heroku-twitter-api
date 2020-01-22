@@ -13,8 +13,10 @@ from wtforms.validators import DataRequired, NumberRange
 from flask_cors import CORS
 
 app = Flask(__name__, static_url_path="", static_folder="static")
-CORS(app)
 app.secret_key = os.urandom(24)
+
+
+CORS(app)
 #app.debug = True
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'

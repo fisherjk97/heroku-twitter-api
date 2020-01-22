@@ -4,9 +4,11 @@
 <head>
 	<title>twitter-api sample app {% block title %}{% endblock %}</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+
 </head>
 
 <body>
+	
 	<div class="container">
 		<h1>Twitter API</h1>
 		{% block containercontent %}{% endblock %}
@@ -17,6 +19,7 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   
   <!-- Load our React component. -->
+		
   <script src="{{ url_for('static', filename='js/like_button.js') }}"></script>
   <script src="{{ url_for('static', filename='js/search.js') }}" type="text/jsx"></script>
   <script src="{{ url_for('static', filename='js/search_tweets.js') }}" type="text/jsx"></script>

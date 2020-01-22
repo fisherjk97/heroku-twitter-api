@@ -1,15 +1,21 @@
+{% extends "base.html" %}
 {% block title %}{% endblock %}
 {% block containercontent %}
-<h3>Search for photos from Twitter</h3>
-<p>Documentation:
-	<a href="https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets">Twitter Dev - Search API</a>
-</p>
+<p>Search for photos from Twitter using your favorite Hashtags</p>
 <div >
-	<form method="POST" action="{{ url_for('callback') }}">
+	<form id="form_search_tweets" method="POST" action="{{ url_for('twitter') }}">
 		{{ form.csrf_token }}
-		<b>{{ form.hashtag.label }}</b> {{ form.hashtag(size=20) }}
-		<b>{{ form.count.label }}</b> {{ form.count(size=20) }}
-		<input type="submit" value="Search" class="btn btn-small btn-success">
+		<div style="width: 25%">
+			<b>{{ form.hashtag.label }}
+			</b> {{ form.hashtag(size=20) }}
+		</div>
+		<br/>
+		<div style="width: 25%">
+			<b>{{ form.count.label }}
+			</b> {{ form.count(size=20) }}
+		</div>
+		<br/>
+		<input  type="submit" value="Search" class="btn btn-small btn-success">
 	</form>
 </div>
 <div>
@@ -23,4 +29,5 @@
 	{% for img in images %}
 		<img src={{img}} width='100%'/>
 	{% endfor %}
+
 {% endblock %}

@@ -77,28 +77,19 @@ def start():
     return render_template('start.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
 
-@app.route('/callback', methods= ['GET', 'POST'])
+@app.route('/callback')
 def callback():
-    form = TweetForm(request.form)
-    if request.method == 'POST' and form.validate():
-        q = form.hashtag.data
-        count = form.count.data
+    #if we haven't already stored session data
 
-        real_oauth_token = session['real_oauth_token']
-        real_oauth_token_secret = session['real_oauth_token_secret']
+    if not (session.get('real_oauth_token')  and session.get('real_oauth_token_secret')):
 
-        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
-
-        media = get_hashtag_media(media_content)
-        message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-        return render_template('callback-success.html', images=media, form=form, message=message)
-    elif request.method == 'GET':
         # Accept the callback params, get the token and call the API to
         # display the logged-in user's name and handle
         oauth_token = request.args.get('oauth_token')
         oauth_verifier = request.args.get('oauth_verifier')
         oauth_denied = request.args.get('denied')
 
+        #oauth_store[oauth_token] = oauth_token_secret
         # if the OAuth request was denied, delete our local token
         # and show an error message
         if oauth_denied:
@@ -118,8 +109,7 @@ def callback():
         # if we got this far, we have both callback params and we have
         # found this token locally
 
-        consumer = oauth.Consumer(
-            app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
+        consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
         token = oauth.Token(oauth_token, oauth_token_secret)
         token.set_verifier(oauth_verifier)
         client = oauth.Client(consumer, token)
@@ -127,20 +117,11 @@ def callback():
         resp, content = client.request(access_token_url, "POST")
         access_token = dict(urllib.parse.parse_qsl(content))
 
-        screen_name = access_token[b'screen_name'].decode('utf-8')
-        user_id = access_token[b'user_id'].decode('utf-8')
-
         # These are the tokens you would store long term, someplace safe
         real_oauth_token = access_token[b'oauth_token'].decode('utf-8')
         real_oauth_token_secret = access_token[b'oauth_token_secret'].decode('utf-8')
 
-        user_content = get_user(real_oauth_token, real_oauth_token_secret, user_id)
-        user_response = to_json(user_content)
 
-        friends_count = user_response['friends_count']
-        statuses_count = user_response['statuses_count']
-        followers_count = user_response['followers_count']
-        name = user_response['name']
 
         # don't keep this token and secret in memory any longer
         del oauth_store[oauth_token]
@@ -152,7 +133,7 @@ def callback():
         session['real_oauth_token_secret'] = real_oauth_token_secret
         #session['consumer'] = consumer
 
-        return render_template('callback-success.html', screen_name=screen_name, user_id=user_id,access_token_url=access_token_url, name=name, form=TweetForm())
+    return render_template('callback-success.html', access_token_url=access_token_url)
 
 
 @app.route('/twitter', methods=['GET', 'POST'])
@@ -169,7 +150,6 @@ def twitter():
 
         media = get_hashtag_media(media_content)
         message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-
         return render_template('twitter.html', images=media, form=form, message=message)
     else:
         return render_template('twitter.html', form=form)

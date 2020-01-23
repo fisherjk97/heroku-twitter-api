@@ -17,7 +17,8 @@ app = Flask(__name__, static_url_path="", static_folder="static")
 
 random_bytes = os.urandom(64)
 secret = base64.b64encode(random_bytes).decode('utf-8')
-app.secret_key = secret
+app.secret_key = os.getenv('TWAUTH_APP_SESSION_SECRET', secret)
+
 
 CORS(app)
 #app.debug = True

@@ -17,7 +17,7 @@ app = Flask(__name__, static_url_path="", static_folder="static")
 
 random_bytes = os.urandom(64)
 secret = base64.b64encode(random_bytes).decode('utf-8')
-app.secret_key = os.getenv('TWAUTH_APP_SESSION_SECRET', secret)
+app.secret_key = secret #os.getenv('TWAUTH_APP_SESSION_SECRET', secret)
 
 
 CORS(app)
@@ -53,14 +53,10 @@ def index():
     #return redirect(url_for('start'))
     return render_template('index.html')
 
-class Consumer(object):
-    def default(self, o):
-            return o.__dict_
-
-
 
 @app.route('/start')
 def start():
+    session.clear()
     # note that the external callback URL must be added to the whitelist on
     # the developer.twitter.com portal, inside the app settings
     app_callback_url = url_for('callback', _external=True)
@@ -81,6 +77,8 @@ def start():
     oauth_token = request_token[b'oauth_token'].decode('utf-8')
     oauth_token_secret = request_token[b'oauth_token_secret'].decode('utf-8')
 
+    session[oauth_token] = oauth_token_secret
+    print(session[oauth_token])
     oauth_store[oauth_token] = oauth_token_secret
     return render_template('start.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
 
@@ -88,7 +86,7 @@ def start():
 @app.route('/callback')
 def callback():
     #if we haven't already stored session data
-
+ 
     if not (session.get('real_oauth_token')  and session.get('real_oauth_token_secret')):
 
         # Accept the callback params, get the token and call the API to
@@ -98,6 +96,7 @@ def callback():
         oauth_denied = request.args.get('denied')
 
         #oauth_store[oauth_token] = oauth_token_secret
+        oauth_token_secret = session[oauth_token]
         # if the OAuth request was denied, delete our local token
         # and show an error message
         if oauth_denied:

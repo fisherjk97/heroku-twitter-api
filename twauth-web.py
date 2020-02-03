@@ -72,7 +72,7 @@ def index():
         return redirect(url_for("twitter.login"))
     resp = twitter.get("account/verify_credentials.json")
     assert resp.ok
-    return ""
+    return redirect(url_for('twitter_api'))
 
 
 @app.route('/start')

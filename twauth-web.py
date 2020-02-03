@@ -181,6 +181,8 @@ def twitter_api():
             media = get_hashtag_media(media_content)
             message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
             return render_template('twitter_api.html', images=media, form=form, message=message)
+        else:
+            return render_template('twitter_api.html', form=form)
     else:
         return render_template('twitter_api.html', form=form)
    

@@ -60,12 +60,6 @@ class TweetForm(Form):
     hashtag  = TextField(u'Hashtag(s)', validators=[DataRequired()])
     count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=20, message='Must be between 1 and 20')])
    
-"""
-@app.route('/')
-def index():
-    #return redirect(url_for('start'))
-    return render_template('index.html')
-"""
 
 @app.route("/")
 def index():
@@ -80,106 +74,14 @@ def start():
     return redirect(url_for('twitter_api'))
 
 
-@app.route('/start2')
-def start2():
-    session.clear()
-    # note that the external callback URL must be added to the whitelist on
-    # the developer.twitter.com portal, inside the app settings
-    app_callback_url = url_for('callback', _external=True)
-
-    # Generate the OAuth request tokens, then display them
-    consumer = oauth.Consumer(
-        app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
-    client = oauth.Client(consumer)
-    resp, content = client.request(request_token_url, "POST", body=urllib.parse.urlencode({
-                                   "oauth_callback": app_callback_url}))
-
-    if resp['status'] != '200':
-        error_message = 'Invalid response, status {status}, {message}'.format(
-            status=resp['status'], message=content.decode('utf-8'))
-        return render_template('error.html', error_message=error_message)
-
-    request_token = dict(urllib.parse.parse_qsl(content))
-    oauth_token = request_token[b'oauth_token'].decode('utf-8')
-    oauth_token_secret = request_token[b'oauth_token_secret'].decode('utf-8')
-
-    session[oauth_token] = oauth_token_secret
-    print(session[oauth_token])
-    oauth_store[oauth_token] = oauth_token_secret
-    return render_template('start.html', authorize_url=authorize_url, oauth_token=oauth_token, request_token_url=request_token_url)
-
-
-@app.route('/callback')
-def callback():
-    #if we haven't already stored session data
- 
-    if not (session.get('real_oauth_token')  and session.get('real_oauth_token_secret')):
-
-        # Accept the callback params, get the token and call the API to
-        # display the logged-in user's name and handle
-        oauth_token = request.args.get('oauth_token')
-        oauth_verifier = request.args.get('oauth_verifier')
-        oauth_denied = request.args.get('denied')
-
-        #oauth_store[oauth_token] = oauth_token_secret
-        oauth_token_secret = session[oauth_token]
-        # if the OAuth request was denied, delete our local token
-        # and show an error message
-        if oauth_denied:
-            if oauth_denied in oauth_store:
-                del oauth_store[oauth_denied]
-            return render_template('error.html', error_message="the OAuth request was denied by this user")
-
-        if not oauth_token or not oauth_verifier:
-            return render_template('error.html', error_message="callback param(s) missing")
-
-        # unless oauth_token is still stored locally, return error
-        if oauth_token not in oauth_store:
-            return render_template('error.html', error_message="oauth_token not found locally")
-
-        oauth_token_secret = oauth_store[oauth_token]
-
-        # if we got this far, we have both callback params and we have
-        # found this token locally
-
-        consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
-        token = oauth.Token(oauth_token, oauth_token_secret)
-        token.set_verifier(oauth_verifier)
-        client = oauth.Client(consumer, token)
-
-        resp, content = client.request(access_token_url, "POST")
-        access_token = dict(urllib.parse.parse_qsl(content))
-
-        # These are the tokens you would store long term, someplace safe
-        real_oauth_token = access_token[b'oauth_token'].decode('utf-8')
-        real_oauth_token_secret = access_token[b'oauth_token_secret'].decode('utf-8')
-
-
-
-        # don't keep this token and secret in memory any longer
-        del oauth_store[oauth_token]
-        #oauth_store['real_oauth_token'] = real_oauth_token
-        #oauth_store['real_oauth_token_secret'] = real_oauth_token_secret
-        #oauth_store['consumer'] = consumer
-
-        session['real_oauth_token'] = real_oauth_token
-        session['real_oauth_token_secret'] = real_oauth_token_secret
-        #session['consumer'] = consumer
-
-    return render_template('callback-success.html', access_token_url=access_token_url)
-
-
 @app.route('/twitter_api', methods=['GET', 'POST'])
 def twitter_api():
     form = TweetForm(request.form)
     if twitter.authorized and request.method == 'POST' and form.validate():
         q = form.hashtag.data
         count = form.count.data
-           
-        real_oauth_token = twitter.token['oauth_token']
-        real_oauth_token_secret = twitter.token['oauth_token_secret']
-
-        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
+        
+        media_content = search_tweets(q, count)
 
         media = get_hashtag_media(media_content)
         message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
@@ -209,33 +111,37 @@ def get_hashtag_media(response):
     return media_files
 
 
-def oauth_get(real_oauth_token, real_oauth_token_secret, request_url):
-    consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
+def oauth_get(request_url):
+    if twitter.authorized:
+        consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
 
-    real_token = oauth.Token(real_oauth_token, real_oauth_token_secret)
-    real_client = oauth.Client(consumer, real_token)
-    real_resp, real_content = real_client.request(request_url, "GET")
+        real_token = oauth.Token(twitter.token['oauth_token'], twitter.token['oauth_token_secret'])
+        real_client = oauth.Client(consumer, real_token)
+        real_resp, real_content = real_client.request(request_url, "GET")
 
+        if real_resp['status'] != '200':
+            error_message = "Invalid response from Twitter API GET search/tweets: {status}".format(
+                status=real_resp['status'])
+            return render_template('error.html', error_message=error_message)
 
-    if real_resp['status'] != '200':
+        return real_content
+    else:
         error_message = "Invalid response from Twitter API GET search/tweets: {status}".format(
-            status=real_resp['status'])
+                status=real_resp['status'])
         return render_template('error.html', error_message=error_message)
 
-    return real_content
 
-
-def search_tweets(real_oauth_token, real_oauth_token_secret, q, count):
+def search_tweets(q, count):
     params = {'q': q, 'count': count}
     encoded = urllib.parse.urlencode(params)
     print(encoded)
     url = search_tweets_url + '?' + encoded
     print(url)
-    return oauth_get(real_oauth_token, real_oauth_token_secret, url)
+    return oauth_get(url)
 
-def get_user(real_oauth_token, real_oauth_token_secret, user_id):
+def get_user(user_id):
     url = show_user_url + '?user_id=' + user_id
-    return oauth_get(real_oauth_token, real_oauth_token_secret, url)
+    return oauth_get(url)
 
 def to_json(content):
     response = content

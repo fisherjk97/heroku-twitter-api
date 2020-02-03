@@ -69,6 +69,10 @@ def index():
 
 @app.route("/")
 def index():
+    return render_template('index.html')
+
+@app.route("/start")
+def start():
     if not twitter.authorized:
         return redirect(url_for("twitter.login"))
     resp = twitter.get("account/verify_credentials.json")
@@ -76,8 +80,8 @@ def index():
     return redirect(url_for('twitter_api'))
 
 
-@app.route('/start')
-def start():
+@app.route('/start2')
+def start2():
     session.clear()
     # note that the external callback URL must be added to the whitelist on
     # the developer.twitter.com portal, inside the app settings

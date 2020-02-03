@@ -70,6 +70,8 @@ def start():
     if not twitter.authorized:
         return redirect(url_for("twitter.login"))
     resp = twitter.get("account/verify_credentials.json")
+    screen_name = resp.json()["screen_name"]
+    name = resp.json()["name"]
     assert resp.ok
     return redirect(url_for('twitter_api'))
 
@@ -81,9 +83,9 @@ def twitter_api():
         q = form.hashtag.data
         count = form.count.data
         
-        media_content = search_tweets(q, count)
+        response = search_tweets(q, count)
 
-        media = get_hashtag_media(media_content)
+        media = get_hashtag_media(response.content)
         message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
         return render_template('twitter_api.html', images=media, form=form, message=message)
     
@@ -111,37 +113,17 @@ def get_hashtag_media(response):
     return media_files
 
 
-def oauth_get(request_url):
-    if twitter.authorized:
-        consumer = oauth.Consumer(app.config['APP_CONSUMER_KEY'], app.config['APP_CONSUMER_SECRET'])
-
-        real_token = oauth.Token(twitter.token['oauth_token'], twitter.token['oauth_token_secret'])
-        real_client = oauth.Client(consumer, real_token)
-        real_resp, real_content = real_client.request(request_url, "GET")
-
-        if real_resp['status'] != '200':
-            error_message = "Invalid response from Twitter API GET search/tweets: {status}".format(
-                status=real_resp['status'])
-            return render_template('error.html', error_message=error_message)
-
-        return real_content
-    else:
-        error_message = "Invalid response from Twitter API GET search/tweets: {status}".format(
-                status=real_resp['status'])
-        return render_template('error.html', error_message=error_message)
-
-
 def search_tweets(q, count):
     params = {'q': q, 'count': count}
     encoded = urllib.parse.urlencode(params)
     print(encoded)
     url = search_tweets_url + '?' + encoded
     print(url)
-    return oauth_get(url)
+    return twitter.get(url)
 
 def get_user(user_id):
     url = show_user_url + '?user_id=' + user_id
-    return oauth_get(url)
+    return twitter.get(url)
 
 def to_json(content):
     response = content

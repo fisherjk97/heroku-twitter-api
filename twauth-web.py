@@ -168,22 +168,19 @@ def callback():
 @app.route('/twitter_api', methods=['GET', 'POST'])
 def twitter_api():
     form = TweetForm(request.form)
-    if request.method == 'POST' and form.validate():
+    if twitter.authorized and request.method == 'POST' and form.validate():
         q = form.hashtag.data
         count = form.count.data
-
-        if twitter.authorized:
            
-            real_oauth_token = twitter.token['oauth_token']
-            real_oauth_token_secret = twitter.token['oauth_token_secret']
+        real_oauth_token = twitter.token['oauth_token']
+        real_oauth_token_secret = twitter.token['oauth_token_secret']
 
-            media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
+        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
 
-            media = get_hashtag_media(media_content)
-            message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-            return render_template('twitter_api.html', images=media, form=form, message=message)
-        else:
-            return render_template('twitter_api.html', form=form)
+        media = get_hashtag_media(media_content)
+        message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
+        return render_template('twitter_api.html', images=media, form=form, message=message)
+    
     else:
         return render_template('twitter_api.html', form=form)
    

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, session, render_template, request, url_for,jsonify, make_response
+from flask import Flask, redirect, session, render_template, request, url_for, jsonify, make_response, flash
 import oauth2 as oauth
 import urllib.request
 import urllib.parse
@@ -12,16 +12,19 @@ import base64
 from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
 from wtforms.validators import DataRequired, NumberRange
 from flask_cors import CORS
-
+from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
+from flask_dance.consumer import oauth_authorized
 app = Flask(__name__, static_url_path="", static_folder="static")
+
 
 random_bytes = os.urandom(64)
 secret = base64.b64encode(random_bytes).decode('utf-8')
 app.secret_key = secret #os.getenv('TWAUTH_APP_SESSION_SECRET', secret)
 
-
 CORS(app)
 #app.debug = True
+
+# get_current_user() is a function that returns the current logged in user
 
 request_token_url = 'https://api.twitter.com/oauth/request_token'
 access_token_url = 'https://api.twitter.com/oauth/access_token'
@@ -41,17 +44,35 @@ app.config['APP_CONSUMER_SECRET'] = os.getenv(
 # APP_CONSUMER_SECRET = 'API_Secret_from_Twitter'
 app.config.from_pyfile('config.cfg', silent=True)
 
+twitter_bp =  make_twitter_blueprint(
+    api_key=app.config['APP_CONSUMER_KEY'],
+    api_secret=app.config['APP_CONSUMER_SECRET'],
+    redirect_url="/twitter_api"
+)
+app.register_blueprint(twitter_bp, url_prefix="/login")
+
+
+
 oauth_store = {}
 
 class TweetForm(Form):
     hashtag  = TextField(u'Hashtag(s)', validators=[DataRequired()])
     count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=20, message='Must be between 1 and 20')])
    
-
+"""
 @app.route('/')
 def index():
     #return redirect(url_for('start'))
     return render_template('index.html')
+"""
+
+@app.route("/")
+def index():
+    if not twitter.authorized:
+        return redirect(url_for("twitter.login"))
+    resp = twitter.get("account/verify_credentials.json")
+    assert resp.ok
+    return ""
 
 
 @app.route('/start')
@@ -143,23 +164,25 @@ def callback():
     return render_template('callback-success.html', access_token_url=access_token_url)
 
 
-@app.route('/twitter', methods=['GET', 'POST'])
-def twitter():
+@app.route('/twitter_api', methods=['GET', 'POST'])
+def twitter_api():
     form = TweetForm(request.form)
     if request.method == 'POST' and form.validate():
         q = form.hashtag.data
         count = form.count.data
 
-        real_oauth_token = session['real_oauth_token']
-        real_oauth_token_secret = session['real_oauth_token_secret']
+        if twitter.authorized:
+           
+            real_oauth_token = twitter.token['oauth_token']
+            real_oauth_token_secret = twitter.token['oauth_token_secret']
 
-        media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
+            media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
 
-        media = get_hashtag_media(media_content)
-        message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-        return render_template('twitter.html', images=media, form=form, message=message)
+            media = get_hashtag_media(media_content)
+            message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
+            return render_template('twitter_api.html', images=media, form=form, message=message)
     else:
-        return render_template('twitter.html', form=form)
+        return render_template('twitter_api.html', form=form)
    
    
 

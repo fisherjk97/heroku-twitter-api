@@ -3,7 +3,7 @@
 {% block containercontent %}
 <p>Search for photos from Twitter using your favorite Hashtags</p>
 <div >
-	<form id="form_search_tweets" method="POST" action="{{ url_for('twitter') }}">
+	<form id="form_search_tweets" method="POST" action="{{ url_for('twitter_api') }}">
 		{{ form.csrf_token }}
 		<div style="width: 25%">
 			<b>{{ form.hashtag.label }}

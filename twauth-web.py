@@ -14,8 +14,9 @@ from wtforms.validators import DataRequired, NumberRange
 from flask_cors import CORS
 from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 from flask_dance.consumer import oauth_authorized
+from werkzeug.contrib.fixers import ProxyFix
 app = Flask(__name__, static_url_path="", static_folder="static")
-
+app.wsgi_app = ProxyFix(app.wsgi_app)
 
 random_bytes = os.urandom(64)
 secret = base64.b64encode(random_bytes).decode('utf-8')
@@ -182,14 +183,7 @@ def twitter_api():
             message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
             return render_template('twitter_api.html', images=media, form=form, message=message)
         else:
-            real_oauth_token = twitter.token['oauth_token']
-            real_oauth_token_secret = twitter.token['oauth_token_secret']
-
-            media_content = search_tweets(real_oauth_token, real_oauth_token_secret, q, count)
-
-            media = get_hashtag_media(media_content)
-            message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-            return render_template('twitter_api.html', images=media, form=form, message=message)
+            return render_template('twitter_api.html', form=form)
     else:
         return render_template('twitter_api.html', form=form)
    

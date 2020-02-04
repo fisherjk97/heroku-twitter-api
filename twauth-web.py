@@ -79,7 +79,7 @@ def start():
 @app.route('/twitter_api', methods=['GET', 'POST'])
 def twitter_api():
     form = TweetForm(request.form)
-    if twitter.authorized and request.method == 'POST' and form.validate():
+    if request.method == 'POST' and form.validate():
         q = form.hashtag.data
         count = form.count.data
         

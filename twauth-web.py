@@ -15,6 +15,7 @@ from flask_cors import CORS
 from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 from flask_dance.consumer import oauth_authorized
 from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.datastructures import MultiDict
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
@@ -79,6 +80,7 @@ def start():
 @app.route('/twitter_api', methods=['GET', 'POST'])
 def twitter_api():
     form = TweetForm(request.form)
+    formSubmitted = False
     if request.method == 'POST' and form.validate():
         q = form.hashtag.data
         count = form.count.data
@@ -86,8 +88,12 @@ def twitter_api():
         response = search_tweets(q, count)
 
         media = get_hashtag_media(response.content)
+
+        nFound = len(media)
+        formSubmitted = True
         message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-        return render_template('twitter_api.html', images=media, form=form, message=message)
+        form = TweetForm()
+        return render_template('twitter_api.html', images=media, form=form, formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
     
     else:
         return render_template('twitter_api.html', form=form)

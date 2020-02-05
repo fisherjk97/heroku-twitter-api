@@ -29,7 +29,7 @@
 {% if formSubmitted %}
 <div>
 	<br/>
-	<p>We found <b class="text-primary">{{nFound}}</b> out of <b>{{count}}</b> possible pictures with this search: <b class="text-primary">{{q}}</b></p>
+	<p>We found <b class="text-primary">{{nFound}}</b> out of <b class="text-primary">{{count}}</b> possible pictures with this search: <b class="text-primary">{{q}}</b></p>
 </div>
 <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 	<div class="carousel-inner">
@@ -55,5 +55,32 @@
 	  <span class="sr-only">Next</span>
 	</a>
   </div>
+<div>
+	<br/>
+	<h3 class="text-primary text-center">Questions?</h3>
+	<ul style="list-style-type:none;">
+		<li>
+			<b>Q:  </b>Wait...I searched for {{count}} tweets, but {{nFound}} returned. What gives?</h4></li>
+		<li>
+			<b>A:  </b>There is a known difference between results provided by the counts endpoint and the data endpoint. You may see a discrepancy in your results because the counts endpoint is pre-compliance (meaning that it does not account for things like deleted Tweets, scrub geo, etc.) whereas the data endpoint is compliant at the time of delivery and accounts for all compliance events. For further reference, please go to this document on our support site.
+		</li>
+		<br/>
+		<li>
+			<b>Q:  </b>I didn't receive a Tweet that should match my query. Why?</h4>
+		</li>
+		<li>
+			<b>A:  </b>There are a few different reasons why this might have happened, including: 
+				1) The Tweet you expected to see is from a protected account
+				2) because the data endpoint accounts for all compliance events (meaning that deleted Tweets, scrubbed geos, etc. will not be included in the response).
+			</li>
+		<br/>
+		<li>
+			<b>Q: </b>Quick question...I still have questions
+		</li>
+		<li>
+			<b>A:  </b>Good question, I recommend checking out Twitter's official <a href="https://developer.twitter.com/en/docs/tweets/search/FAQ">FAQ</a>
+		</li>
+	  </ul>
+</div>
 {% endif %}
 {% endblock %}

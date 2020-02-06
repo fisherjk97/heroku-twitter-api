@@ -36,12 +36,19 @@
 		{% for img in images %}
 			{% if loop.index == 1 %}
 			<div class="carousel-item active">
-				<img src="{{img}}" width="100%" class="d-block w-100"/>
+				<img src={{img.media|tojson|safe}} width="100%" class="d-block w-100"/>
+				<p></p>
+				<div class="carousel-caption d-none d-md-block">
+					<p>{{img.text}}</p>
+				  </div>
 			</div>
 			{% else %}
 
 			<div class="carousel-item">
-				<img src={{img}} width="100%" class="d-block w-100"/>
+				<img src={{img.media|tojson|safe}} width="100%" class="d-block w-100"/>
+				<div class="carousel-caption d-none d-md-block">
+					<p>{{img.text}}</p>
+				  </div>
 			</div>
 			{% endif %}
 		{% endfor %}
@@ -75,7 +82,7 @@
 			</li>
 		<br/>
 		<li>
-			<b>Q: </b>Quick question...I still have questions
+			<b>Q: </b>Quick question...I still have questions.
 		</li>
 		<li>
 			<b>A:  </b>Good question, I recommend checking out Twitter's official <a href="https://developer.twitter.com/en/docs/tweets/search/FAQ">FAQ</a>

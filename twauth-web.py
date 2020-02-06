@@ -62,6 +62,14 @@ class TweetForm(Form):
     count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=20, message='Must be between 1 and 20')], render_kw={"placeholder": "10"})
    
 
+class Tweet():
+    media = ""
+    text = ""
+    
+    def __init__(self, media, text):
+        self.media = media
+        self.text = text
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -98,7 +106,6 @@ def twitter_api():
     else:
         return render_template('twitter_api.html', form=form)
    
-   
 
 @app.errorhandler(500)
 def internal_server_error(e):
@@ -108,15 +115,22 @@ def internal_server_error(e):
 def get_hashtag_media(response):
     tweets = json.loads(response)
     media_files = set()
+    
+    response_tweets = []
     for status in tweets["statuses"]:
+        tweet = {}
+        text = status['text']
         # print("Status: %s" % status)
         if("media" in status["entities"]):
             media = status["entities"].get('media', [])
             if(len(media) > 0):
+                media_url = media[0]['media_url']
                 media_files.add(media[0]['media_url'])
                 print("Media: %s" % media[0]['media_url'])
-
-    return media_files
+                t = Tweet(media_url, text)
+                response_tweets.append(t)
+    
+    return response_tweets
 
 
 def search_tweets(q, count):

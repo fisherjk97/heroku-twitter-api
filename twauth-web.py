@@ -8,6 +8,7 @@ import json
 import urllib.parse
 import urllib
 from flask_restful import Resource, Api
+import re
 import base64 
 from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
 from wtforms.validators import DataRequired, NumberRange
@@ -123,6 +124,7 @@ def get_hashtag_media(response):
     for status in tweets["statuses"]:
         tweet = {}
         text = status['text']
+        
         # print("Status: %s" % status)
         if("media" in status["entities"]):
             media = status["entities"].get('media', [])
@@ -131,7 +133,10 @@ def get_hashtag_media(response):
                 media_url = media[0]['media_url']
                 media_files.add(media[0]['media_url'])
                 print("Media: %s" % media[0]['media_url'])
-                text = text.replace(src_url, '').rstrip()
+                #cleaned = text.replace(src_url, '').rstrip()
+                text = text.replace(src_url, '')
+                text = re.sub(r'^https?:\/\/.*[\r\n]*', '', text, flags=re.MULTILINE)
+                text = text.rstrip("\n\r")
                 t = Tweet(media_url, text, src_url)
                 response_tweets.append(t)
     

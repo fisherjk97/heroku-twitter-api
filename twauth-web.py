@@ -65,10 +65,13 @@ class TweetForm(Form):
 class Tweet():
     media = ""
     text = ""
+    src = ""
+
     
-    def __init__(self, media, text):
+    def __init__(self, media, text, src):
         self.media = media
         self.text = text
+        self.src = src
 
 @app.route("/")
 def index():
@@ -124,17 +127,19 @@ def get_hashtag_media(response):
         if("media" in status["entities"]):
             media = status["entities"].get('media', [])
             if(len(media) > 0):
+                src_url = media[0]['url']
                 media_url = media[0]['media_url']
                 media_files.add(media[0]['media_url'])
                 print("Media: %s" % media[0]['media_url'])
-                t = Tweet(media_url, text)
+                text = text.replace(src_url, '').rstrip()
+                t = Tweet(media_url, text, src_url)
                 response_tweets.append(t)
     
     return response_tweets
 
 
 def search_tweets(q, count):
-    params = {'q': q, 'count': count}
+    params = {'q': q, 'count': count, "lang": "en"}
     encoded = urllib.parse.urlencode(params)
     print(encoded)
     url = search_tweets_url + '?' + encoded

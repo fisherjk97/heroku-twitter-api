@@ -64,15 +64,27 @@ class TweetForm(Form):
    
 
 class Tweet():
-    media = ""
+    media_id = ""
+    media_url = ""
     text = ""
     src = ""
 
     
-    def __init__(self, media, text, src):
-        self.media = media
+    def __init__(self, media_id, media_url, text, src):
+        self.media_id = media_id
+        self.media_url = media_url
         self.text = text
         self.src = src
+
+
+    def __hash__(self):
+        return hash(('media_id', self.media_id,
+                 'media_url', self.media_url,
+                 'text', self.text,
+                 'src', self.src))
+
+    def __eq__(self, other):
+        return self.media_id == other.media_id
 
 @app.route("/")
 def index():
@@ -98,7 +110,7 @@ def twitter_api():
         count = form.count.data
         
         response = search_tweets(q, count)
-
+        ##data = jsonify(response.text).json
         media = get_hashtag_media(response.content)
 
         nFound = len(media)
@@ -116,31 +128,48 @@ def internal_server_error(e):
     return render_template('error.html', error_message='uncaught exception'), 500
 
 
+def write_to_json_file(name, data):
+     with open(name, 'w') as f:
+        
+        json.dump(data, f)
+        
+
 def get_hashtag_media(response):
     tweets = json.loads(response)
-    media_files = set()
-    
+
+    response_dict = {}
     response_tweets = []
+   
     for status in tweets["statuses"]:
-        tweet = {}
         text = status['text']
+        has_standard_entities = (status.get('entities', None) != None)
+        has_extended_entities = (status.get('extended_entities', None) != None)
+        if(has_standard_entities and  has_extended_entities):
+            if("extended_entities" in status and "media" in status["extended_entities"]):
+                extended_media = status["extended_entities"].get('media', [])
+                for media in extended_media:
+                    t = parse_media_tweet(media, text)
+                    if(t.media_id not in response_dict):
+                        response_dict[t.media_id] = t
+                        response_tweets.append(t)
         
-        # print("Status: %s" % status)
-        if("media" in status["entities"]):
-            media = status["entities"].get('media', [])
-            if(len(media) > 0):
-                src_url = media[0]['url']
-                media_url = media[0]['media_url']
-                media_files.add(media[0]['media_url'])
-                print("Media: %s" % media[0]['media_url'])
-                #cleaned = text.replace(src_url, '').rstrip()
-                text = text.replace(src_url, '')
-                text = re.sub(r'^https?:\/\/.*[\r\n]*', '', text, flags=re.MULTILINE)
-                text = text.rstrip("\n\r")
-                t = Tweet(media_url, text, src_url)
-                response_tweets.append(t)
+
     
     return response_tweets
+
+
+def parse_media_tweet(media, text):
+    src_url = media['url'] if("url" in media) else ""
+    media_url = media['media_url'] if("media_url" in media) else ""
+    media_id = media['id'] if("id" in media) else ""
+    if(text != ""):
+        text = text.replace(src_url, '')
+        text = re.sub(r'^https?:\/\/.*[\r\n]*', '', text, flags=re.MULTILINE)
+        text = text.rstrip("\n\r")
+    
+
+    return Tweet(media_id, media_url, text, src_url)
+
 
 
 def search_tweets(q, count):

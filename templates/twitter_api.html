@@ -43,7 +43,7 @@
 		{% for img in images %}
 			{% if loop.index == 1 %}
 			<div class="carousel-item active">
-				<img src={{img.media|tojson|safe}} width="100%" class="d-block w-100"/>
+				<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt={{img.media_id}}/>
 				<br/>
 				<p class="font-italic text-primary">{{img.text}}</p>
 				<div class="text-center">
@@ -54,7 +54,7 @@
 			</div>
 			{% else %}
 			<div class="carousel-item">
-				<img src={{img.media|tojson|safe}} width="100%" class="d-block w-100"/>
+				<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt={{img.media_id}}/>
 				<br/>
 				<p class="font-italic text-primary">{{img.text}}</p>
 				<div class="text-center">

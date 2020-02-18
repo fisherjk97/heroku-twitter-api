@@ -59,7 +59,7 @@ app.register_blueprint(twitter_bp, url_prefix="/login")
 oauth_store = {}
 
 class TweetForm(Form):
-    hashtag  = TextField(u'Hashtag(s)', validators=[DataRequired()], render_kw={"placeholder": "#Cool #Pictures"})
+    hashtag  = TextField(u'Hashtag(s)', validators=[DataRequired()], render_kw={"placeholder": "#Cool #Pictures @twitterhandle"})
     count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=100, message='Must be between 1 and 100')], render_kw={"placeholder": "Think of a number 1-100"})
    
 

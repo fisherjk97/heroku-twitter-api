@@ -138,8 +138,7 @@ def get_hashtag_media(response):
     tweets = json.loads(response)
 
     response_dict = {}
-    response_tweets = []
-   
+    
     for status in tweets["statuses"]:
         text = status['text']
         has_standard_entities = (status.get('entities', None) != None)
@@ -151,10 +150,9 @@ def get_hashtag_media(response):
                     t = parse_media_tweet(media, text)
                     if(t.media_id not in response_dict):
                         response_dict[t.media_id] = t
-                        response_tweets.append(t)
         
 
-    
+    response_tweets = [ v for v in response_dict.values() ]
     return response_tweets
 
 

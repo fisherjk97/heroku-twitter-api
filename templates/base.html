@@ -4,10 +4,11 @@
 <head>
 	<title>twitter-api sample app {% block title %}{% endblock %}</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
 </head>
 
-<body>
+<body id="twitter-body">
 	
 	<div class="container">
 		<h1 class="text-primary text-center">Twitter API</h1>

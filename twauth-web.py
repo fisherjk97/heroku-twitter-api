@@ -121,6 +121,27 @@ def twitter_api():
     
     else:
         return render_template('twitter_api.html', form=form)
+
+@app.route('/twitter_api2', methods=['GET', 'POST'])
+def twitter_api2():
+    form = TweetForm(request.form)
+    formSubmitted = False
+    if request.method == 'POST' and form.validate():
+        q = form.hashtag.data
+        count = form.count.data
+        
+        response = search_tweets(q, count)
+        ##data = jsonify(response.text).json
+        media = get_hashtag_media(response.content)
+
+        nFound = len(media)
+        formSubmitted = True
+        message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
+        form = TweetForm()
+        return render_template('twitter_api2.html', images=media, form=form, formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
+    
+    else:
+        return render_template('twitter_api2.html', form=form)
    
 
 @app.errorhandler(500)

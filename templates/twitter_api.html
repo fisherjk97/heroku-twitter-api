@@ -10,6 +10,7 @@
 			<tr>
 				<th><b>{{ form.hashtag.label }}</th>
 				<th><b>{{ form.count.label }}</th>
+				<th></th>
 			</tr>
 			<tr>
 				<td>
@@ -18,12 +19,13 @@
 				<td>
 					{{ form.count(size=50) }}
 				</td>
+				<td>
+					<input type="submit" value="Go!" class="btn btn-small btn-success">
+
+				</td>
 			</tr>
 		</table>
-		<br/>
-		<div class="text-center">
-			<input type="submit" value="Search" class="btn btn-small btn-success">
-		</div>
+		
 	</form>
 	</div>
 <div>
@@ -38,30 +40,45 @@
 	<br/>
 	<p>We found <b class="text-primary">{{nFound}}</b> out of <b class="text-primary">{{count}}</b> possible pictures with this search: <b class="text-primary">{{q}}</b></p>
 </div>
-<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+<div id="carouselExampleControls" class="carousel slide carousel-fade" data-ride="carousel">
 	<div class="carousel-inner">
 		{% for img in images %}
 			{% if loop.index == 1 %}
-			<div class="carousel-item active">
-				<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt={{img.media_id}}/>
+			<div class="carousel-item twitter-dark active">
+				<!--<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt={{img.media_id}}/>-->
+				<a href={{img.media_url|tojson|safe}} title="click here to see the full sized image"></a>
+						<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt="{{img.text}}">
+					</a>
 				<br/>
-				<p class="font-italic text-primary">{{img.text}}</p>
+				<h5 class="font-italic text-white text-center">{{img.text}}</p>
 				<div class="text-center">
-					<form action={{img.src}} target="_blank">
-						<button class="btn btn-small btn-primary">View Original</button>
+					<div class="btn-group">
+					<form action={{img.src}} target="_blank" >
+						<button class="btn btn-small btn-outline-light" alt="View the image with the original tweet">View Original</button>
 					</form>
+					<a href={{img.media_url|tojson|safe}} title="Click to enlarge">
+						<button class="btn btn-small btn-outline-light">Enlarge</button>
+					</a>
+					</div>
 				</div>
 			</div>
 			{% else %}
-			<div class="carousel-item">
-				<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt={{img.media_id}}/>
+			<div class="carousel-item twitter-dark">
+				<a href={{img.media_url|tojson|safe}} title="click here to see the full sized image"></a>
+				<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt="{{img.text}}">
+				</a>
 				<br/>
-				<p class="font-italic text-primary">{{img.text}}</p>
-				<div class="text-center">
-					<form action={{img.src}} target="_blank">
-						<button class="btn btn-small btn-primary">View Original</button>
-					</form>
-				</div>
+				<h5 class="font-italic text-white text-center">{{img.text}}</p>
+					<div class="text-center">
+						<div class="btn-group">
+						<form action={{img.src}} target="_blank">
+							<button class="btn btn-small btn-outline-light" alt="View the image with the original tweet">View Original</button>
+						</form>
+						<a href={{img.media_url|tojson|safe}} title="Click to enlarge">
+							<button class="btn btn-small btn-outline-light">Enlarge</button>
+						</a>
+						</div>
+					</div>
 			</div>
 			{% endif %}
 		{% endfor %}

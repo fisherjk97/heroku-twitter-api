@@ -2,7 +2,7 @@
 {% block title %}{% endblock %}
 {% block containercontent %}
 <h3 class="text-primary">Pictures</h3>
-<p class="font-italic">Search for photos from Twitter using your favorite Hashtags</p>
+<h5 class="font-italic">Search for photos from Twitter using your favorite Hashtags</h4>
 <div >
 	<form id="form_search_tweets" method="POST" action="{{ url_for('twitter_api') }}">
 		{{ form.csrf_token }}
@@ -38,7 +38,8 @@
 {% if formSubmitted %}
 <div>
 	<br/>
-	<p>We found <b class="text-primary">{{nFound}}</b> out of <b class="text-primary">{{count}}</b> possible pictures with this search: <b class="text-primary">{{q}}</b></p>
+	<h5 class="text-center">We found <b class="text-primary">{{nFound}}</b> / <b class="text-primary">{{count}}</b> possible pictures with this search: <br/> <b class="text-primary">{{q}}</b></h5>
+	<br/>
 </div>
 <div id="carouselExampleControls" class="carousel slide carousel-fade" data-ride="carousel">
 	<div class="carousel-inner">
@@ -92,9 +93,11 @@
 	  <span class="sr-only">Next</span>
 	</a>
   </div>
-<div>
+<div class="text-center">
 	<br/>
-	<h3 class="text-primary text-center">Questions?</h3>
+	<button type="button" class="btn btn-primary text-center" data-toggle="collapse" data-target="#demo">Got Questions?</button>
+	<div id="demo" class="collapse text-left">
+		<br/>
 	<ul style="list-style-type:none;">
 		<li>
 			<b>Q:  </b>Wait...I searched for {{count}} tweets, but {{nFound}} returned. What gives?</h4></li>
@@ -118,6 +121,7 @@
 			<b>A:  </b>Good question, I recommend checking out Twitter's official <a href="https://developer.twitter.com/en/docs/tweets/search/FAQ">FAQ</a>
 		</li>
 	  </ul>
+	</div>
 </div>
 {% endif %}
 {% endblock %}

@@ -63,11 +63,15 @@ class TweetForm(Form):
     count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=100, message='Must be between 1 and 100')], render_kw={"placeholder": "Think of a number 1-100"})
    
 
+
+
 class Tweet():
     media_id = ""
     media_url = ""
     text = ""
     src = ""
+    media_url_lg = ""
+  
 
     
     def __init__(self, media_id, media_url, text, src):
@@ -75,6 +79,7 @@ class Tweet():
         self.media_url = media_url
         self.text = text
         self.src = src
+        self.media_url_lg = self.media_url + ":large"
 
 
     def __hash__(self):

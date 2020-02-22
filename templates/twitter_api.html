@@ -1,32 +1,25 @@
 {% extends "base.html" %}
+
 {% block title %}{% endblock %}
 {% block containercontent %}
 <h3 class="text-primary">Pictures</h3>
 <h5 class="font-italic">Search for photos from Twitter using your favorite Hashtags</h4>
 <div >
-	<form id="form_search_tweets" method="POST" action="{{ url_for('twitter_api') }}">
-		{{ form.csrf_token }}
-		<table>
-			<tr>
-				<th><b>{{ form.hashtag.label }}</th>
-				<th><b>{{ form.count.label }}</th>
-				<th></th>
-			</tr>
-			<tr>
-				<td>
-					{{ form.hashtag(size=50) }}
-				</td>
-				<td>
-					{{ form.count(size=50) }}
-				</td>
-				<td>
-					<input type="submit" value="Go!" class="btn btn-small btn-success">
-
-				</td>
-			</tr>
-		</table>
-		
+	<form class="form form-horizontal" id="form_search_tweets" method="POST" action="{{ url_for('twitter_api') }}">
+		<div class="form-row">
+		  <div class="form-group col-md-6">
+			
+			<input name="hashtag" type="text" class="form-control" id="hashtag" placeholder="Enter hashtags like #ReallyCoolPhotos @mytwitterhandle">
+		  </div>
+		  <div class="form-group col-md-4">
+			<input name="count" type="number" class="form-control" id="count" placeholder="Think of a number between 1-100">
+		  </div>
+		  <div class="col-md-2 input-append">
+			<button id="submitBtn" type="submit" class="form-control btn btn-primary">Go!</button>
+		</div>
+		</div>
 	</form>
+	
 	</div>
 <div>
 	{% for field, errors in form.errors.items() %}

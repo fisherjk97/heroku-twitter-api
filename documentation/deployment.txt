@@ -1,0 +1,4 @@
+How do I deploy to heroku?
+
+Checkin code to the heroku git repo: https://git.heroku.com/fisherjk97-twitter-api.git
+

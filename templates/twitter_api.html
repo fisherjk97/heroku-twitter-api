@@ -4,14 +4,14 @@
 {% block containercontent %}
 <h3 class="text-primary">Pictures</h3>
 <h5 class="font-italic">Search for photos from Twitter using your favorite Hashtags</h4>
-<div >
+<div>
 	<form class="form form-horizontal" id="form_search_tweets" method="POST" action="{{ url_for('twitter_api') }}">
 		<div class="form-row">
-		  <div class="form-group col-md-6">
+		  <div class="form-group col-md-6 col-sm-12 col-xs-12">
 			
 			<input name="hashtag" type="text" class="form-control" id="hashtag" placeholder="Enter hashtags like #ReallyCoolPhotos @mytwitterhandle">
 		  </div>
-		  <div class="form-group col-md-4">
+		  <div class="form-group col-md-4 col-sm-12 col-xs-12">
 			<input name="count" type="number" class="form-control" id="count" placeholder="Think of a number between 1-100">
 		  </div>
 		  <div class="col-md-2 input-append">

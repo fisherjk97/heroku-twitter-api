@@ -20,7 +20,7 @@
 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 	<h3>Friends</h3>
 	<ul>
-		{% for friend in friends %}
+		{% for friend in friends | sort(attribute='screen_name')%}
 			<li><a href='https://twitter.com/{{friend.screen_name}}'>{{friend.screen_name}}</a> - {{friend.name}}</li>
 		{% endfor %}
 	</ul>
@@ -29,7 +29,7 @@
 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 	<h3>Followers</h3>
 	<ul>
-		{% for follower in followers %}
+		{% for follower in followers  | sort(attribute='screen_name')%}
 			<li><a href='https://twitter.com/{{follower.screen_name}}'>{{follower.screen_name}}</a> - {{follower.name}}</li>
 		{% endfor %}
 	</ul>

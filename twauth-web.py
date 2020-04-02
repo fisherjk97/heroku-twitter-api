@@ -17,6 +17,7 @@ from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 from flask_dance.consumer import oauth_authorized
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.datastructures import MultiDict
+from operator import itemgetter, attrgetter
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
@@ -308,7 +309,10 @@ def get_friends_info(response):
         friend = Friend(friend_id, name, screen_name)
         response_dict[friend.friend_id] = friend
 
+    ##sorted_friends = response_dict.sort(key=attrgetter('name'))
     response_friends = [ v for v in response_dict.values() ]
+    ###sorted_friends = response_friends.sort(key=attrgetter('name'))
+
     return response_friends
 
 def get_followers_info(response):

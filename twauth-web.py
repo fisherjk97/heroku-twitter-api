@@ -105,9 +105,8 @@ def start():
     assert resp.ok
     return redirect(url_for('twitter_api'))
 
-
-@app.route('/twitter_api', methods=['GET', 'POST'])
-def twitter_api():
+@app.route("/api_pictures", methods=['GET', 'POST'])
+def api_pictures():
     form = TweetForm(request.form)
     formSubmitted = False
     if request.method == 'POST' and form.validate():
@@ -122,10 +121,15 @@ def twitter_api():
         formSubmitted = True
         message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
         form = TweetForm()
-        return render_template('twitter_api.html', images=media, form=form, formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
+        return render_template('api_pictures.html', images=media, form=form, formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
     
     else:
-        return render_template('twitter_api.html', form=form)
+        return render_template('api_pictures.html', form=form)
+    
+@app.route('/twitter_api', methods=['GET', 'POST'])
+def twitter_api():
+    form = TweetForm(request.form)
+    return render_template('twitter_api.html', form=form)
 
 @app.route('/twitter_image', methods=['GET', 'POST'])
 def twitter_image():

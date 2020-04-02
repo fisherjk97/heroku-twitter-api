@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+{% block containercontent %}
+
+<form class="form form-horizontal">
+	<div class="form-row">
+	  <div class="form-group col-md-2 col-sm-12 col-xs-12">
+		<h3 class="text-primary">Pictures</h3>
+	  </div>
+	  <div class="form-group col-md-8 col-sm-12 col-xs-12"> 
+		<h3 class="font-italic">Search for photos from Twitter using your favorite Hashtags</h4>
+	  </div>
+	  <div class="form-group col-md-2 col-sm-12 col-xs-12">
+	  </div>
+	</div>
+</form>
+<div>
+	<form class="form form-horizontal" id="form_search_tweets" method="POST" action="{{ url_for('api_pictures') }}">
+		<div class="form-row">
+		  <div class="form-group col-md-6 col-sm-12 col-xs-12">
+			
+			<input name="hashtag" type="text" class="form-control" id="hashtag" placeholder="Enter hashtags like #ReallyCoolPhotos @mytwitterhandle">
+		  </div>
+		  <div class="form-group col-md-4 col-sm-12 col-xs-12">
+			<input name="count" type="number" class="form-control" id="count" placeholder="Think of a number between 1-100">
+		  </div>
+		  <div class="col-md-2 input-append">
+			<button id="submitBtn" type="submit" class="form-control btn btn-primary">Go!</button>
+		</div>
+		</div>
+	</form>
+	
+    </div>
+<!--
+<div>
+	{% for field, errors in form.errors.items() %}
+    <div class="alert alert-error">
+        {{ form[field].label }}: {{ ', '.join(errors) }}
+    </div>
+    {% endfor %}
+</div>
+-->
+{% if formSubmitted %}
+<div>
+	<br/>
+	<h5 class="text-center">We found <b class="text-primary">{{nFound}}</b> / <b class="text-primary">{{count}}</b> possible pictures with this search: <br/> <b class="text-primary">{{q}}</b></h5>
+	<br/>
+</div>
+<div id="carouselExampleControls" class="carousel slide carousel-fade" data-ride="carousel">
+	<div class="carousel-inner">
+		{% for img in images %}
+			{% if loop.index == 1 %}
+			<div class="carousel-item twitter-dark active">
+				<!--<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt={{img.media_id}}/>-->
+				<a href={{img.media_url|tojson|safe}} title="click here to see the full sized image"></a>
+						<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt="{{img.text}}">
+					</a>
+				<br/>
+				<h5 class="font-italic text-white text-center">{{img.text}}</p>
+				<div class="text-center">
+					<div class="btn-group">
+					<form action={{img.src}} target="_blank" >
+						<button class="btn btn-small btn-outline-light" alt="View the image with the original tweet">View Original</button>
+					</form>
+					<a href={{img.media_url_lg|tojson|safe}} title="Click to enlarge">
+						<button class="btn btn-small btn-outline-light">Enlarge</button>
+					</a>
+					</div>
+				</div>
+			</div>
+			{% else %}
+			<div class="carousel-item twitter-dark">
+				<a href={{img.media_url|tojson|safe}} title="click here to see the full sized image"></a>
+				<img src={{img.media_url|tojson|safe}} width="100%" class="d-block w-100" alt="{{img.text}}">
+				</a>
+				<br/>
+				<h5 class="font-italic text-white text-center">{{img.text}}</p>
+					<div class="text-center">
+						<div class="btn-group">
+						<form action={{img.src}} target="_blank">
+							<button class="btn btn-small btn-outline-light" alt="View the image with the original tweet">View Original</button>
+						</form>
+						<a href={{img.media_url_lg|tojson|safe}} title="Click to enlarge">
+							<button class="btn btn-small btn-outline-light">Enlarge</button>
+						</a>
+						</div>
+					</div>
+			</div>
+			{% endif %}
+		{% endfor %}
+	</div>
+	<a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+	  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+	  <span class="sr-only">Previous</span>
+	</a>
+	<a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+	  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+	  <span class="sr-only">Next</span>
+	</a>
+  </div>
+<div class="text-center">
+	<br/>
+	<button type="button" class="btn btn-primary text-center" data-toggle="collapse" data-target="#demo">Got Questions?</button>
+	<div id="demo" class="collapse text-left">
+		<br/>
+	<ul style="list-style-type:none;">
+		<li>
+			<b>Q:  </b>Wait...I searched for {{count}} tweets, but {{nFound}} returned. What gives?</h4></li>
+		<li>
+			<b>A:  </b>There is a known difference between results provided by the counts endpoint and the data endpoint. You may see a discrepancy in your results because the counts endpoint is pre-compliance (meaning that it does not account for things like deleted Tweets, scrub geo, etc.) whereas the data endpoint is compliant at the time of delivery and accounts for all compliance events. For further reference, please go to this document on our support site.
+		</li>
+		<br/>
+		<li>
+			<b>Q:  </b>I didn't receive a Tweet that should match my query. Why?</h4>
+		</li>
+		<li>
+			<b>A:  </b>There are a few different reasons why this might have happened, including: 
+				1) The Tweet you expected to see is from a protected account
+				2) because the data endpoint accounts for all compliance events (meaning that deleted Tweets, scrubbed geos, etc. will not be included in the response).
+			</li>
+		<br/>
+		<li>
+			<b>Q: </b>Quick question...I still have questions.
+		</li>
+		<li>
+			<b>A:  </b>Good question, I recommend checking out Twitter's official <a href="https://developer.twitter.com/en/docs/tweets/search/FAQ">FAQ</a>
+		</li>
+	  </ul>
+	</div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -61,7 +61,11 @@ oauth_store = {}
 class TweetForm(Form):
     hashtag  = TextField(u'Hashtag(s)', validators=[DataRequired()], render_kw={"placeholder": "#Cool #Pictures @twitterhandle"})
     count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=100, message='Must be between 1 and 100')], render_kw={"placeholder": "Think of a number 1-100"})
-   
+
+class UserForm(Form):
+    screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "#Cool #Pictures @twitterhandle"})
+    count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=100, message='Must be between 1 and 100')], render_kw={"placeholder": "Think of a number 1-100"})
+    
 
 
 
@@ -91,6 +95,54 @@ class Tweet():
     def __eq__(self, other):
         return self.media_id == other.media_id
 
+
+class Friend():
+    friend_id = ""
+    name = ""
+    screen_name = ""
+
+  
+
+    
+    def __init__(self, friend_id, name, screen_name):
+        self.friend_id = friend_id
+        self.name = name
+        self.screen_name = screen_name
+       
+
+
+    def __hash__(self):
+        return hash(('friend_id', self.friend_id,
+                 'name', self.name,
+                 'screen_name', self.screen_name))
+
+    def __eq__(self, other):
+        return self.friend_id == other.friend_id
+
+class Follower():
+    follower_id = ""
+    name = ""
+    screen_name = ""
+
+  
+
+    
+    def __init__(self, follower_id, name, screen_name):
+        self.follower_id = follower_id
+        self.name = name
+        self.screen_name = screen_name
+       
+
+
+    def __hash__(self):
+        return hash(('follower_id', self.follower_id,
+                 'name', self.name,
+                 'screen_name', self.screen_name))
+
+    def __eq__(self, other):
+        return self.follower_id == other.follower_id
+
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -104,6 +156,27 @@ def start():
     name = resp.json()["name"]
     assert resp.ok
     return redirect(url_for('twitter_api'))
+
+@app.route("/api_user", methods=['GET', 'POST'])
+def api_user():
+    form = UserForm(request.form)
+    
+    resp = twitter.get("account/verify_credentials.json")
+    screen_name = resp.json()["screen_name"]
+    name = resp.json()["name"]
+    count = 200
+    queryString = "?screen_name=" + screen_name + "&count=200"
+
+    resp_friends = twitter.get("friends/list.json" + queryString)
+    resp_followers = twitter.get("followers/list.json" + queryString)
+
+    friends = get_friends_info(resp_friends)
+    followers = get_followers_info(resp_followers)
+
+    form = UserForm()
+
+    return render_template('api_user.html', form=form, friends=friends, followers=followers)
+
 
 @app.route("/api_pictures", methods=['GET', 'POST'])
 def api_pictures():
@@ -220,6 +293,38 @@ def parse_media_tweet(media, text):
 
     return Tweet(media_id, media_url, text, src_url)
 
+
+
+
+def get_friends_info(response):
+    friends = json.loads(response.content)
+
+    response_dict = {}
+    
+    for user in friends["users"]:
+        friend_id = user['id']
+        name = user['name']
+        screen_name = user['screen_name']
+        friend = Friend(friend_id, name, screen_name)
+        response_dict[friend.friend_id] = friend
+
+    response_friends = [ v for v in response_dict.values() ]
+    return response_friends
+
+def get_followers_info(response):
+    followers = json.loads(response.content)
+
+    response_dict = {}
+    
+    for user in followers["users"]:
+        follower_id = user['id']
+        name = user['name']
+        screen_name = user['screen_name']
+        follower = Follower(follower_id, name, screen_name)
+        response_dict[follower.follower_id] = follower
+
+    response_followers = [ v for v in response_dict.values() ]
+    return response_followers
 
 
 def search_tweets(q, count):

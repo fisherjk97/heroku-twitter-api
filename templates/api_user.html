@@ -20,8 +20,11 @@
 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 	<h3>Friends</h3>
 	<ul>
-		{% for friend in friends | sort(attribute='screen_name')%}
-			<li><a href='https://twitter.com/{{friend.screen_name}}'>{{friend.screen_name}}</a> - {{friend.name}}</li>
+		{% for x in friends | sort(attribute='screen_name')%}
+			<li><a href='https://twitter.com/{{x.screen_name}}'>{{x.screen_name}}</a> - {{x.name}}</li>
+			<img src={{x.profile_image_url|tojson|safe}} width="50px"  >
+			<p>{{x.description}}</p>
+
 		{% endfor %}
 	</ul>
 </div>
@@ -29,10 +32,35 @@
 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 	<h3>Followers</h3>
 	<ul>
-		{% for follower in followers  | sort(attribute='screen_name')%}
-			<li><a href='https://twitter.com/{{follower.screen_name}}'>{{follower.screen_name}}</a> - {{follower.name}}</li>
-		{% endfor %}
+		{% for x in followers  | sort(attribute='screen_name')%}
+			<li><a href='https://twitter.com/{{x.screen_name}}'>{{x.screen_name}}</a> - {{x.name}}</li>
+			<img src={{x.profile_image_url|tojson|safe}} width="50px">
+			<p>{{x.description}}</p>
+
+
+			{% endfor %}
 	</ul>
 </div>
 </div>
+
+
+<div class="row">
+	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+		<h3>Friends</h3>
+		<ul>
+			{% for friend in friends | sort(attribute='screen_name')%}
+				<li>{{friend.raw}}</li>
+			{% endfor %}
+		</ul>
+	</div>
+	
+	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+		<h3>Followers</h3>
+		<ul>
+			{% for follower in followers  | sort(attribute='screen_name')%}
+				<li>{{follower.raw}}</li>
+			{% endfor %}
+		</ul>
+	</div>
+	</div>
 {% endblock %}

@@ -97,51 +97,43 @@ class Tweet():
         return self.media_id == other.media_id
 
 
-class Friend():
-    friend_id = ""
-    name = ""
+class Account():
+    account_id = ""
     screen_name = ""
-
-  
-
+    name = ""
+    description = ""
+    profile_url = ""
+    profile_image_url = "" 
+    friends_count = 0
+    followers_count = 0
     
-    def __init__(self, friend_id, name, screen_name):
-        self.friend_id = friend_id
-        self.name = name
+    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count):
+        self.account_id = account_id
         self.screen_name = screen_name
+        self.name = name
+        self.description = description
+        self.profile_url = profile_url
+        self.profile_image_url = profile_image_url
+        self.friends_count = friends_count
+        self.followers_count = followers_count
        
 
 
     def __hash__(self):
-        return hash(('friend_id', self.friend_id,
+        return hash(
+                ('account_id', self.account_id,
+                 'screen_name', self.screen_name,
                  'name', self.name,
-                 'screen_name', self.screen_name))
+                 'description',self.description,
+                'profile_url', self.profile_url,
+                'profile_image_url', self.profile_image_url,
+                'friends_count', self.friends_count,
+                'followers_count',  self.followers_count
+                 ))
 
     def __eq__(self, other):
-        return self.friend_id == other.friend_id
+        return self.account_id == other.account_id
 
-class Follower():
-    follower_id = ""
-    name = ""
-    screen_name = ""
-
-  
-
-    
-    def __init__(self, follower_id, name, screen_name):
-        self.follower_id = follower_id
-        self.name = name
-        self.screen_name = screen_name
-       
-
-
-    def __hash__(self):
-        return hash(('follower_id', self.follower_id,
-                 'name', self.name,
-                 'screen_name', self.screen_name))
-
-    def __eq__(self, other):
-        return self.follower_id == other.follower_id
 
 
 @app.route("/")
@@ -165,14 +157,14 @@ def api_user():
     resp = twitter.get("account/verify_credentials.json")
     screen_name = resp.json()["screen_name"]
     name = resp.json()["name"]
-    count = 200
+    count = 100
     queryString = "?screen_name=" + screen_name + "&count=200"
 
     resp_friends = twitter.get("friends/list.json" + queryString)
     resp_followers = twitter.get("followers/list.json" + queryString)
 
-    friends = get_friends_info(resp_friends)
-    followers = get_followers_info(resp_followers)
+    friends = get_accounts(resp_friends)
+    followers = get_accounts(resp_followers)
 
     form = UserForm()
 
@@ -297,38 +289,27 @@ def parse_media_tweet(media, text):
 
 
 
-def get_friends_info(response):
-    friends = json.loads(response.content)
+def get_accounts(response):
+    accounts = json.loads(response.content)
 
     response_dict = {}
     
-    for user in friends["users"]:
-        friend_id = user['id']
-        name = user['name']
-        screen_name = user['screen_name']
-        friend = Friend(friend_id, name, screen_name)
-        response_dict[friend.friend_id] = friend
+    for a in accounts["users"]:
+        account_id = a['id']
+        screen_name = a['screen_name']
+        name = a['name']
+        description = a['description']
+        profile_url = a['url']
+        profile_image_url = a['profile_image_url_https']
+        friends_count = a['friends_count']
+        followers_count = a['followers_count']
+        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count)
+        response_dict[response_account.account_id] = response_account
 
-    ##sorted_friends = response_dict.sort(key=attrgetter('name'))
-    response_friends = [ v for v in response_dict.values() ]
-    ###sorted_friends = response_friends.sort(key=attrgetter('name'))
+    response_accounts = [ v for v in response_dict.values() ]
 
-    return response_friends
+    return response_accounts
 
-def get_followers_info(response):
-    followers = json.loads(response.content)
-
-    response_dict = {}
-    
-    for user in followers["users"]:
-        follower_id = user['id']
-        name = user['name']
-        screen_name = user['screen_name']
-        follower = Follower(follower_id, name, screen_name)
-        response_dict[follower.follower_id] = follower
-
-    response_followers = [ v for v in response_dict.values() ]
-    return response_followers
 
 
 def search_tweets(q, count):

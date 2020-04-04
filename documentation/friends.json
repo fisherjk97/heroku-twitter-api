@@ -1,0 +1,49 @@
+{'id': 1029800132676444160, 'id_str': 
+    '1029800132676444160', 'name': 'Dark Horse Direct',
+     'screen_name': 'DarkHorseDirect', 'location': '', 
+     'description': '', 
+     'url':
+      'https: //t.co/uWeGsED0jC', 
+     'entities': 
+        {'url': 
+            {'urls': 
+                [
+                    {'url': 'https://t.co/uWeGsED0jC',
+                         'expanded_url': 'http://Direct.DarkHorse.com',
+                          'display_url': 'Direct.DarkHorse.com', 
+                          'indices': [0, 23]}]}, 
+                          'description': 
+                          {'urls': []}}, 
+                        'protected': False, 
+                        'followers_count': 2264, 
+                        'friends_count': 44, 
+                        'listed_count': 3, 
+                        'created_at': 'Wed Aug 15 18:40:59 +0000 2018', 
+                        'favourites_count': 439, 
+                        'utc_offset': None, 'time_zone': None, 
+                        'geo_enabled': False, 'verified': False, 
+                        'statuses_count': 287, 'lang': None, 
+                        'status': {'
+                            created_at': 'Fri Apr 03 15:55:08 +0000 2020',
+                             'id': 1246103953000919041, 
+                             'id_str': '1246103953000919041', 
+                             'text': '@DennisManders1 @DarkHorseComics Hello @Dennismanders1,
+                              Please feel free to contact our customer service team at
+                               Di… https://t.co/oySx1IPIXO',
+                               
+                               'truncated': True, 
+                               'entities': {'hashtags': [], 'symbols': [], 'user_mentions': 
+                                [{'screen_name': 'DennisManders1', 'name':
+                                     'Dennis Manders', 'id': 1498329378, 'id_str':
+                                      '1498329378', 'indices': [0, 15]}, {
+                                          'screen_name': 'DarkHorseComics', 'name': 'Dark Horse Comics', 'id': 17105214, 'id_str': '17105214', 'indices': [16, 32]}, {'screen_name': 'DennisManders1', 'name': 'Dennis Manders', 'id': 1498329378, 'id_str': '1498329378', 'indices': [39, 54]}], 
+                                          'urls': [{'url': 'https://t.co/oySx1IPIXO', 'expanded_url': 'https://twitter.com/i/web/status/1246103953000919041', 'display_url': 'twitter.com/i/web/status/1…', 'indices': [117, 140]}]}, 'source': '<a href="https://mobile.twitter.com" rel="nofollow">Twitter Web App</a>', 'in_reply_to_status_id': 1245976395928473600, 'in_reply_to_status_id_str': '1245976395928473600', 'in_reply_to_user_id': 1498329378, 'in_reply_to_user_id_str': '1498329378', 'in_reply_to_screen_name': 'DennisManders1', 'geo': None, 'coordinates': None, 'place': None, 'contributors': None, 'is_quote_status': False, 'retweet_count': 0, 'favorite_count': 0, 'favorited': False, 'retweeted': False, 'lang': 'en'},
+                                            
+                                            'contributors_enabled': False, 'is_translator': False, 'is_translation_enabled': False, 
+                            
+                            
+                            
+                            'profile_background_color': 'F5F8FA', 'profile_background_image_url': None, 'profile_background_image_url_https': None, 'profile_background_tile': False, 'profile_image_url': 'http://pbs.twimg.com/profile_images/1029800238339354624/s2Q-nKNi_normal.png', 'profile_image_url_https': 'https://pbs.twimg.com/profile_images/1029800238339354624/s2Q-nKNi_normal.png', 'profile_banner_url': 'https://pbs.twimg.com/profile_banners/1029800132676444160/1585249335', 'profile_link_color': '1DA1F2', 'profile_sidebar_border_color': 'C0DEED', 'profile_sidebar_fill_color': 'DDEEF6', 'profile_text_color': '333333', 'profile_use_background_image': True, 'has_extended_profile': False, 'default_profile': True, 'default_profile_image': False, 'following': True, 'live_following': False, 'follow_request_sent': False, 'notifications': False, 'muting': False, 'blocking': False, 'blocked_by': False, 'translator_type': 'none'}
+
+
+    {'id': 765001458, 'id_str': '765001458', 'name': 'Katie Fisher', 'screen_name': 'kgcfisher', 'location': '', 'description': '', 'url': None, 'entities': {'description': {'urls': []}}, 'protected': False, 'followers_count': 13, 'friends_count': 33, 'listed_count': 0, 'created_at': 'Sat Aug 18 03:47:59 +0000 2012', 'favourites_count': 1, 'utc_offset': None, 'time_zone': None, 'geo_enabled': False, 'verified': False, 'statuses_count': 2, 'lang': None, 'status': {'created_at': 'Mon Jun 20 23:39:12 +0000 2016', 'id': 745038322880282624, 'id_str': '745038322880282624', 'text': "Happy Birthday Kate! You're awesome! I just entered @k8_smallthings huge 30th birthday giveaway! You should too!", 'truncated': False, 'entities': {'hashtags': [], 'symbols': [], 'user_mentions': [{'screen_name': 'K8_smallthings', 'name': 'Kate Bryan', 'id': 357700276, 'id_str': '357700276', 'indices': [52, 67]}], 'urls': []}, 'source': '<a href="http://twitter.com" rel="nofollow">Twitter Web Client</a>', 'in_reply_to_status_id': None, 'in_reply_to_status_id_str': None, 'in_reply_to_user_id': None, 'in_reply_to_user_id_str': None, 'in_reply_to_screen_name': None, 'geo': None, 'coordinates': None, 'place': None, 'contributors': None, 'is_quote_status': False, 'retweet_count': 0, 'favorite_count': 1, 'favorited': False, 'retweeted': False, 'lang': 'en'}, 'contributors_enabled': False, 'is_translator': False, 'is_translation_enabled': False, 'profile_background_color': '000000', 'profile_background_image_url': 'http://abs.twimg.com/images/themes/theme1/bg.png', 'profile_background_image_url_https': 'https://abs.twimg.com/images/themes/theme1/bg.png', 'profile_background_tile': False, 'profile_image_url': 'http://pbs.twimg.com/profile_images/1194081403782279168/7w0DGwpF_normal.jpg', 'profile_image_url_https': 'https://pbs.twimg.com/profile_images/1194081403782279168/7w0DGwpF_normal.jpg', 'profile_link_color': 'F5ABB5', 'profile_sidebar_border_color': '000000', 'profile_sidebar_fill_color': '000000', 'profile_text_color': '000000', 'profile_use_background_image': False, 'has_extended_profile': False, 'default_profile': False, 'default_profile_image': False, 'following': True, 'live_following': False, 'follow_request_sent': False, 'notifications': False, 'muting': False, 'blocking': False, 'blocked_by': False, 'translator_type': 'none'}

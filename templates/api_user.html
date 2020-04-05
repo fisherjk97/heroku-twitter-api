@@ -17,50 +17,65 @@
 </form>
 
 <div class="row">
-<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-	<h3>Friends</h3>
-	<ul>
-		{% for x in friends | sort(attribute='screen_name')%}
-			<li><a href='https://twitter.com/{{x.screen_name}}'>{{x.screen_name}}</a> - {{x.name}}</li>
-			<img src={{x.profile_image_url|tojson|safe}} width="50px"  >
-			<p>{{x.description}}</p>
-
-		{% endfor %}
-	</ul>
-</div>
-
-<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-	<h3>Followers</h3>
-	<ul>
-		{% for x in followers  | sort(attribute='screen_name')%}
-			<li><a href='https://twitter.com/{{x.screen_name}}'>{{x.screen_name}}</a> - {{x.name}}</li>
-			<img src={{x.profile_image_url|tojson|safe}} width="50px">
-			<p>{{x.description}}</p>
-
-
-			{% endfor %}
-	</ul>
-</div>
-</div>
-
-
-<div class="row">
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-		<h3>Friends</h3>
-		<ul>
-			{% for friend in friends | sort(attribute='screen_name')%}
-				<li>{{friend.raw}}</li>
-			{% endfor %}
-		</ul>
+		<h3>Following</h3>
+		<ul class="list-unstyled">
+			{% for x in friends  | sort(attribute='screen_name')%}
+				<li class="media my-4">
+					<div class="align-self-start">
+						<a href='https://twitter.com/{{x.screen_name}}'>
+							<img class="mr-3" src={{x.profile_image_url|tojson|safe}} alt={{x.screen_name}} width="64px">
+						</a>
+					</div>
+					<div class="media-body">
+						<h5 class="mt-0 mb-1">{{x.name}}</h5>
+						{{x.description}}
+						<ul class="list-group">
+							<li class="list-group-item d-flex justify-content-between align-items-center">
+							  Followers
+							  <span class="badge badge-primary badge-pill">{{x.followers_count}}</span>
+							</li>
+							<li class="list-group-item d-flex justify-content-between align-items-center">
+							  Following
+							  <span class="badge badge-primary badge-pill">{{x.friends_count}}</span>
+							</li>
+							
+						  </ul>
+						
+						
+					</div>
+				</li>
+				{% endfor %}
+		  </ul>
 	</div>
-	
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 		<h3>Followers</h3>
-		<ul>
-			{% for follower in followers  | sort(attribute='screen_name')%}
-				<li>{{follower.raw}}</li>
-			{% endfor %}
+		<ul class="list-unstyled">
+			{% for x in followers  | sort(attribute='screen_name')%}
+				<li class="media my-4">
+					<div class="align-self-start">
+						<a href='https://twitter.com/{{x.screen_name}}'>
+							<img class="mr-3" src={{x.profile_image_url|tojson|safe}} alt={{x.screen_name}} width="64px">
+						</a>
+					</div>
+					<div class="media-body">
+						<h5 class="mt-0 mb-1">{{x.name}}</h5>
+						{{x.description}}
+						<ul class="list-group">
+							<li class="list-group-item d-flex justify-content-between align-items-center">
+							  Followers
+							  <span class="badge badge-primary badge-pill">{{x.followers_count}}</span>
+							</li>
+							<li class="list-group-item d-flex justify-content-between align-items-center">
+							  Following
+							  <span class="badge badge-primary badge-pill">{{x.friends_count}}</span>
+							</li>
+							
+						  </ul>
+					</div>
+				</li>
+				{% endfor %}
 		</ul>
 	</div>
-	</div>
+</div>
 {% endblock %}

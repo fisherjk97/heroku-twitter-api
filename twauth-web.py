@@ -157,7 +157,7 @@ def api_user():
     resp = twitter.get("account/verify_credentials.json")
     screen_name = resp.json()["screen_name"]
     name = resp.json()["name"]
-    count = 100
+    count = 20
     queryString = "?screen_name=" + screen_name + "&count=200"
 
     resp_friends = twitter.get("friends/list.json" + queryString)

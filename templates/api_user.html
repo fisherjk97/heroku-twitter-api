@@ -15,7 +15,20 @@
 	  </div>
 	</div>
 </form>
-
+<div>
+	<form class="form form-horizontal" id="form_search_tweets" method="POST" action="{{ url_for('api_user') }}">
+		<div class="form-row">
+		  <div class="form-group col-md-6 col-sm-12 col-xs-12">
+			<input name="screenName" type="text" class="form-control" id="screenName" placeholder="Enter a twitter screen name like @mytwitterhandle">
+		  </div>
+		  <div class="col-md-2 input-append">
+			<button id="submitBtn" type="submit" class="form-control btn btn-primary">Go!</button>
+		</div>
+		</div>
+	</form>
+	
+	</div>
+	<h3 class="text-center">Search Results for <span class="text-primary">'{{screen_name}}'</span></h3>
 <div class="row">
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 		<h3>Following</h3>

@@ -64,8 +64,7 @@ class TweetForm(Form):
     count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=100, message='Must be between 1 and 100')], render_kw={"placeholder": "Think of a number 1-100"})
 
 class UserForm(Form):
-    screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "#Cool #Pictures @twitterhandle"})
-    count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=100, message='Must be between 1 and 100')], render_kw={"placeholder": "Think of a number 1-100"})
+    screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "@twitterhandle"})
     
 
 
@@ -153,23 +152,27 @@ def start():
 @app.route("/api_user", methods=['GET', 'POST'])
 def api_user():
     form = UserForm(request.form)
-    
-    resp = twitter.get("account/verify_credentials.json")
-    screen_name = resp.json()["screen_name"]
-    name = resp.json()["name"]
-    count = 20
-    queryString = "?screen_name=" + screen_name + "&count=200"
+    if request.method == 'POST' and form.validate():
+        screen_name = form.screenName.data
 
-    resp_friends = twitter.get("friends/list.json" + queryString)
-    resp_followers = twitter.get("followers/list.json" + queryString)
+        ###resp = twitter.get("account/verify_credentials.json")
+        ##screen_name = resp.json()["screen_name"]
+        #name = resp.json()["name"]
+        #count = 20
+        screen_name = screen_name.replace("@", "")
+        queryString = "?screen_name=" + screen_name + "&count=200"
 
-    friends = get_accounts(resp_friends)
-    followers = get_accounts(resp_followers)
+        resp_friends = twitter.get("friends/list.json" + queryString)
+        resp_followers = twitter.get("followers/list.json" + queryString)
 
-    form = UserForm()
+        friends = get_accounts(resp_friends)
+        followers = get_accounts(resp_followers)
 
-    return render_template('api_user.html', form=form, friends=friends, followers=followers)
+        form = UserForm()
 
+        return render_template('api_user.html', form=form, screen_name=screen_name, friends=friends, followers=followers)
+    else:
+        return render_template('api_user.html', form=form)
 
 @app.route("/api_pictures", methods=['GET', 'POST'])
 def api_pictures():

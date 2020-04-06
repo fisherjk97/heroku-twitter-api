@@ -103,6 +103,7 @@ class Account():
     description = ""
     profile_url = ""
     profile_image_url = "" 
+    profile_image_url_lg = "" 
     friends_count = 0
     followers_count = 0
     
@@ -113,6 +114,7 @@ class Account():
         self.description = description
         self.profile_url = profile_url
         self.profile_image_url = profile_image_url
+        self.profile_image_url_lg = self.profile_image_url.replace("_normal", "_bigger")
         self.friends_count = friends_count
         self.followers_count = followers_count
        
@@ -300,36 +302,30 @@ def get_accounts(response):
     response_dict = {}
     
     for a in accounts["users"]:
-        account_id = a['id']
-        screen_name = a['screen_name']
-        name = a['name']
-        description = a['description']
-        profile_url = a['url']
-        profile_image_url = a['profile_image_url_https']
-        friends_count = a['friends_count']
-        followers_count = a['followers_count']
-        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count)
+        response_account = parse_account(a)
         response_dict[response_account.account_id] = response_account
 
     response_accounts = [ v for v in response_dict.values() ]
 
     return response_accounts
 
+def parse_account(account):
+    if(account):
+        account_id = account['id']
+        screen_name = account['screen_name']
+        name = account['name']
+        description = account['description']
+        profile_url = account['url'] if account['url'] != None else ""
+        profile_image_url = account['profile_image_url_https']
+        friends_count = account['friends_count']
+        followers_count = account['followers_count']
+        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count)
+
+    return response_account
+
 def get_user_info(response):
     a = json.loads(response.content)
-    
-    if(a):
-        account_id = a['id']
-        screen_name = a['screen_name']
-        name = a['name']
-        description = a['description']
-        profile_url = a['url'] if a['url'] != None else ""
-        profile_image_url = a['profile_image_url_https']
-        friends_count = a['friends_count']
-        followers_count = a['followers_count']
-        response_user = Account(account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count)
-
-
+    response_user = parse_account(a)
     return response_user
 
 

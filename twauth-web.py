@@ -164,15 +164,17 @@ def api_user():
 
         resp_friends = twitter.get("friends/list.json" + queryString)
         resp_followers = twitter.get("followers/list.json" + queryString)
-
+ 
+        resp_screenName = twitter.get("users/show.json" + "?screen_name=" + screen_name) 
+        user = get_user_info(resp_screenName)
         friends = get_accounts(resp_friends)
         followers = get_accounts(resp_followers)
 
         form = UserForm()
 
-        return render_template('api_user.html', form=form, screen_name=screen_name, friends=friends, followers=followers)
+        return render_template('api_user.html', form=form, formSubmitted=True, screen_name=screen_name, user=user, friends=friends, followers=followers)
     else:
-        return render_template('api_user.html', form=form)
+        return render_template('api_user.html', form=form, formSubmitted=False)
 
 @app.route("/api_pictures", methods=['GET', 'POST'])
 def api_pictures():
@@ -312,6 +314,23 @@ def get_accounts(response):
     response_accounts = [ v for v in response_dict.values() ]
 
     return response_accounts
+
+def get_user_info(response):
+    a = json.loads(response.content)
+    
+    if(a):
+        account_id = a['id']
+        screen_name = a['screen_name']
+        name = a['name']
+        description = a['description']
+        profile_url = a['url'] if a['url'] != None else ""
+        profile_image_url = a['profile_image_url_https']
+        friends_count = a['friends_count']
+        followers_count = a['followers_count']
+        response_user = Account(account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count)
+
+
+    return response_user
 
 
 

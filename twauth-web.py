@@ -104,10 +104,11 @@ class Account():
     profile_url = ""
     profile_image_url = "" 
     profile_image_url_lg = "" 
+    profile_image_banner_url = ""
     friends_count = 0
     followers_count = 0
     
-    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count):
+    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count):
         self.account_id = account_id
         self.screen_name = screen_name
         self.name = name
@@ -115,6 +116,7 @@ class Account():
         self.profile_url = profile_url
         self.profile_image_url = profile_image_url
         self.profile_image_url_lg = self.profile_image_url.replace("_normal", "_bigger")
+        self.profile_image_banner_url = profile_image_banner_url
         self.friends_count = friends_count
         self.followers_count = followers_count
        
@@ -128,6 +130,7 @@ class Account():
                  'description',self.description,
                 'profile_url', self.profile_url,
                 'profile_image_url', self.profile_image_url,
+                'profile_image_banner_url', self.profile_image_banner_url,
                 'friends_count', self.friends_count,
                 'followers_count',  self.followers_count
                  ))
@@ -162,7 +165,7 @@ def api_user():
         #name = resp.json()["name"]
         #count = 20
         screen_name = screen_name.replace("@", "")
-        queryString = "?screen_name=" + screen_name + "&count=200"
+        queryString = "?screen_name=" + screen_name + "&count=10"
 
         resp_friends = twitter.get("friends/list.json" + queryString)
         resp_followers = twitter.get("followers/list.json" + queryString)
@@ -317,9 +320,13 @@ def parse_account(account):
         description = account['description']
         profile_url = account['url'] if account['url'] != None else ""
         profile_image_url = account['profile_image_url_https']
+        profile_image_banner_url = ""
+        if('profile_banner_url' in account):
+            profile_image_banner_url = account['profile_banner_url']
+        #profile_image_banner_url = account['profile_banner_url'] if account['profile_banner_url'] != None else ""
         friends_count = account['friends_count']
         followers_count = account['followers_count']
-        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, friends_count, followers_count)
+        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count)
 
     return response_account
 

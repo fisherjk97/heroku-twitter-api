@@ -12,10 +12,10 @@
 <form class="form form-horizontal">
 	<div class="form-row">
 	  <div class="form-group col-md-2 col-sm-12 col-xs-12">
-		<h3 class="text-primary">User Info</h3>
+		<h3 class="text-primary">User</h3>
 	  </div>
 	  <div class="form-group col-md-8 col-sm-12 col-xs-12"> 
-		<h3 class="font-italic">Get information about your user account</h4>
+		<h4 class="font-italic">Search for information on Twitter user accounts</h4>
 		</div>
 	  <div class="form-group col-md-2 col-sm-12 col-xs-12">
 	  </div>
@@ -39,7 +39,8 @@
 
 
 	<div class="row">
-			<h3>User</h3>
+		<h3 class="text-primary">User</h3>
+		<div class="card-columns">
 		<div class="card">
 			<img src={{user.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 			<div class="card-body">
@@ -49,11 +50,13 @@
 				<h5 class="card-title">{{user.name}}</h5>
 				<h5 class="card-title"><a href='https://twitter.com/{{user.screen_name}}'>@{{user.screen_name}}</a></h5>
 				<p class="card-text">{{user.description}}</p>
-				<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+				<p class="card-text"><small class="text-muted">Last tweeted {{user.last_tweeted}}</small></p>
 			</div>
 		</div>
 	</div>
+	</div>
 	<div class="row">
+		<h3 class="text-center text-primary">Following</h3>
 			<div class="card-columns">
 				{% for x in friends  | sort(attribute='screen_name')%}
 				<div class="card">
@@ -65,77 +68,29 @@
 						<h5 class="card-title">{{x.name}}</h5>
 						<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 						<p class="card-text">{{x.description}}</p>
-						<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+						<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted}}</small></p>
 					</div>
 				</div>
 				{% endfor %}
 		</div>
 	</div>
 	<div class="row">
-	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-		<h3>Following</h3>
-		<ul class="list-unstyled">
-			{% for x in friends  | sort(attribute='screen_name')%}
-				<li class="media my-4">
-					<div class="align-self-start">
-						<a href='https://twitter.com/{{x.screen_name}}'>
-							<img class="mr-3" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
-						</a>
-					</div>
-					<div class="media-body">
-						<h5 class="mt-0 mb-1"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a> - {{x.name}}</h5>
-						{{x.description}}
-					</br>
-
-						<ul class="list-group">
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-							  Followers
-							  <span class="badge badge-primary badge-pill">{{x.followers_count}}</span>
-							</li>
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-							  Following
-							  <span class="badge badge-primary badge-pill">{{x.friends_count}}</span>
-							</li>
-							
-						  </ul>
-						
-						
-					</div>
-				</li>
-				{% endfor %}
-		  </ul>
-	</div>
-	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-		<h3>Followers</h3>
-		<ul class="list-unstyled">
+		<h3 class="text-center text-primary">Followers</h3>
+		<div class="card-columns">
 			{% for x in followers  | sort(attribute='screen_name')%}
-				<li class="media my-4">
-					<div class="align-self-start">
-						<a href='https://twitter.com/{{x.screen_name}}'>
-							<img class="mr-3" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
-						</a>
-					</div>
-					<div class="media-body">
-						<h5 class="mt-0 mb-1"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a> - {{x.name}}</h5>
-						{{x.description}}
-					</br>
-
-						<ul class="list-group">
-						
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-							  Followers
-							  <span class="badge badge-primary badge-pill">{{x.followers_count}}</span>
-							</li>
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-							  Following
-							  <span class="badge badge-primary badge-pill">{{x.friends_count}}</span>
-							</li>
-							
-						  </ul>
-					</div>
-				</li>
-				{% endfor %}
-		</ul>
+			<div class="card">
+				<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
+				<div class="card-body">
+					<a href='https://twitter.com/{{x.screen_name}}'>
+						<img class="mr-3" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
+					</a>
+					<h5 class="card-title">{{x.name}}</h5>
+					<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
+					<p class="card-text">{{x.description}}</p>
+					<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted}}</small></p>
+				</div>
+			</div>
+			{% endfor %}
 	</div>
 </div>
 {% endif %}

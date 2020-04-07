@@ -10,6 +10,8 @@ import urllib
 from flask_restful import Resource, Api
 import re
 import base64 
+import time
+from datetime import datetime
 from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
 from wtforms.validators import DataRequired, NumberRange
 from flask_cors import CORS
@@ -67,7 +69,19 @@ class UserForm(Form):
     screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "@twitterhandle"})
     
 
+@app.template_filter('formatdatetime')
+def format_datetime(value, format="%d %b %Y %I:%M %p"):
+    """Format a date time to (Default): d Mon YYYY HH:MM P"""
+    if value is None:
+        return ""
+    return value.strftime(format)
 
+
+def set_date(date_str):
+        """Convert twitter datestring to datetime
+        """
+        time_struct = time.strptime(date_str, "%a %b %d %H:%M:%S +0000 %Y")#Tue Apr 26 08:57:55 +0000 2011
+        return datetime.fromtimestamp(time.mktime(time_struct))
 
 class Tweet():
     media_id = ""
@@ -107,8 +121,9 @@ class Account():
     profile_image_banner_url = ""
     friends_count = 0
     followers_count = 0
+    last_tweeted = ""
     
-    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count):
+    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, last_tweeted):
         self.account_id = account_id
         self.screen_name = screen_name
         self.name = name
@@ -119,6 +134,7 @@ class Account():
         self.profile_image_banner_url = profile_image_banner_url
         self.friends_count = friends_count
         self.followers_count = followers_count
+        self.last_tweeted = set_date(last_tweeted)
        
 
 
@@ -164,13 +180,13 @@ def api_user():
         ##screen_name = resp.json()["screen_name"]
         #name = resp.json()["name"]
         #count = 20
-        screen_name = screen_name.replace("@", "")
-        queryString = "?screen_name=" + screen_name + "&count=10"
+        cleaned_screen_name = screen_name.replace("@", "")
+        queryString = "?screen_name=" + cleaned_screen_name + "&count=20"
 
         resp_friends = twitter.get("friends/list.json" + queryString)
         resp_followers = twitter.get("followers/list.json" + queryString)
  
-        resp_screenName = twitter.get("users/show.json" + "?screen_name=" + screen_name) 
+        resp_screenName = twitter.get("users/show.json" + "?screen_name=" + cleaned_screen_name) 
         user = get_user_info(resp_screenName)
         friends = get_accounts(resp_friends)
         followers = get_accounts(resp_followers)
@@ -323,10 +339,18 @@ def parse_account(account):
         profile_image_banner_url = ""
         if('profile_banner_url' in account):
             profile_image_banner_url = account['profile_banner_url']
+        else:
+            profile_image_banner_url = account['profile_background_image_url_https']
         #profile_image_banner_url = account['profile_banner_url'] if account['profile_banner_url'] != None else ""
         friends_count = account['friends_count']
         followers_count = account['followers_count']
-        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count)
+
+        last_tweeted = None
+        if 'status' in account:
+            tweet = account["status"]
+            last_tweeted = tweet['created_at']
+
+        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, last_tweeted)
 
     return response_account
 

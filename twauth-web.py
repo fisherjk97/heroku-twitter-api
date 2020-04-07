@@ -11,6 +11,8 @@ from flask_restful import Resource, Api
 import re
 import base64 
 import time
+import babel
+from babel.dates import format_date, format_datetime
 from datetime import datetime
 from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
 from wtforms.validators import DataRequired, NumberRange
@@ -69,12 +71,16 @@ class UserForm(Form):
     screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "@twitterhandle"})
     
 
-@app.template_filter('formatdatetime')
-def format_datetime(value, format="%d %b %Y %I:%M %p"):
-    """Format a date time to (Default): d Mon YYYY HH:MM P"""
-    if value is None:
-        return ""
-    return value.strftime(format)
+###format date - http://babel.pocoo.org/en/latest/dates.html
+@app.template_filter('datetime')
+def format_datetime(value, format='medium'):
+    if format == 'full':
+        format="EEEE, d. MMMM y 'at' HH:mm"
+    elif format == 'medium':
+        format="EE dd.MM.y HH:mm"
+    elif format == 'shorttime':
+        format="M/d/y @ h:mm a"
+    return babel.dates.format_datetime(value, format)
 
 
 def set_date(date_str):

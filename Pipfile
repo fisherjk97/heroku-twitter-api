@@ -16,6 +16,7 @@ flask-restful = "*"
 wtforms = "*"
 flask-cors = "*"
 flask-dance = "*"
+babel = "*"
 
 [dev-packages]
 

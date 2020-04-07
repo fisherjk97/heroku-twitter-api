@@ -50,7 +50,7 @@
 				<h5 class="card-title">{{user.name}}</h5>
 				<h5 class="card-title"><a href='https://twitter.com/{{user.screen_name}}'>@{{user.screen_name}}</a></h5>
 				<p class="card-text">{{user.description}}</p>
-				<p class="card-text"><small class="text-muted">Last tweeted {{user.last_tweeted}}</small></p>
+				<p class="card-text"><small class="text-muted">Last tweeted {{user.last_tweeted|datetime('shorttime')}}</small></p>
 			</div>
 		</div>
 	</div>
@@ -68,7 +68,7 @@
 						<h5 class="card-title">{{x.name}}</h5>
 						<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 						<p class="card-text">{{x.description}}</p>
-						<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted}}</small></p>
+						<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
 					</div>
 				</div>
 				{% endfor %}
@@ -87,7 +87,7 @@
 					<h5 class="card-title">{{x.name}}</h5>
 					<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 					<p class="card-text">{{x.description}}</p>
-					<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted}}</small></p>
+					<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
 				</div>
 			</div>
 			{% endfor %}

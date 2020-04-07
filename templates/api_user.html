@@ -61,7 +61,7 @@
 	<div class="row">
 		<h3 class="text-center text-primary">Following</h3>
 			<div class="card-columns">
-				{% for x in friends  | sort(attribute='screen_name')%}
+				{% for x in friends  | sort(attribute='last_tweeted', reverse= True) %}
 				<div class="card">
 					<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 					<div class="card-body">
@@ -83,7 +83,7 @@
 	<div class="row">
 		<h3 class="text-center text-primary">Followers</h3>
 		<div class="card-columns">
-			{% for x in followers  | sort(attribute='screen_name')%}
+			{% for x in followers  | sort(attribute='last_tweeted', reverse= True)%}
 			<div class="card">
 				<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 				<div class="card-body">

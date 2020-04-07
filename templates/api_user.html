@@ -45,12 +45,15 @@
 			<img src={{user.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 			<div class="card-body">
 				<a href='https://twitter.com/{{user.screen_name}}'>
-					<img class="mr-3" src={{user.profile_image_url_lg|tojson|safe}} alt={{user.screen_name}} >
+					<img class="mr-3 rounded-circle" src={{user.profile_image_url_lg|tojson|safe}} alt={{user.screen_name}} >
 				</a>
 				<h5 class="card-title">{{user.name}}</h5>
 				<h5 class="card-title"><a href='https://twitter.com/{{user.screen_name}}'>@{{user.screen_name}}</a></h5>
 				<p class="card-text">{{user.description}}</p>
-				<p class="card-text"><small class="text-muted">Last tweeted {{user.last_tweeted|datetime('shorttime')}}</small></p>
+				<p class="card-text"><small class="text-primary">Last tweeted {{user.last_tweeted|datetime('shorttime')}}</small></p>
+				<a href='https://twitter.com/{{user.screen_name}}'>
+					<button id="submitBtn" type="submit" class="form-control btn btn-dark">View Profile</button>
+				</a>
 			</div>
 		</div>
 	</div>
@@ -63,12 +66,15 @@
 					<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 					<div class="card-body">
 						<a href='https://twitter.com/{{x.screen_name}}'>
-							<img class="mr-3" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
+							<img class="mr-3 rounded-circle" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
 						</a>
 						<h5 class="card-title">{{x.name}}</h5>
 						<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 						<p class="card-text">{{x.description}}</p>
-						<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
+						<p class="card-text"><small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
+						<a href='https://twitter.com/{{x.screen_name}}'>
+							<button id="submitBtn" type="submit" class="form-control btn btn-dark">View Profile</button>
+						</a>
 					</div>
 				</div>
 				{% endfor %}
@@ -82,12 +88,15 @@
 				<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 				<div class="card-body">
 					<a href='https://twitter.com/{{x.screen_name}}'>
-						<img class="mr-3" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
+						<img class="mr-3 rounded-circle" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
 					</a>
 					<h5 class="card-title">{{x.name}}</h5>
 					<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 					<p class="card-text">{{x.description}}</p>
-					<p class="card-text"><small class="text-muted">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
+					<p class="card-text"><small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
+					<a href='https://twitter.com/{{x.screen_name}}'>
+						<button id="submitBtn" type="submit" class="form-control btn btn-dark">View Profile</button>
+					</a>
 				</div>
 			</div>
 			{% endfor %}

@@ -17,6 +17,7 @@ flask-cors = "*"
 flask-dance = "*"
 babel = "*"
 werkzeug = "==1.0.0"
+flask-fontawesome = "*"
 
 [dev-packages]
 

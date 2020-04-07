@@ -2,10 +2,11 @@
 <html lang="en">
 
 <head>
-	<title>twitter-api sample app {% block title %}{% endblock %}</title>
+	<title>fisherjk97 - Hello Twitter {% block title %}{% endblock %}</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-
+  {{ fontawesome_html() }}
+  {{ fontawesome_css() }}
 </head>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <a class="navbar-brand" href="/">Hello Twitter</a>

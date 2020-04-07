@@ -11,12 +11,12 @@ itsdangerous = "*"
 Flask = "*"
 "Jinja2" = "*"
 MarkupSafe = "*"
-Werkzeug = "*"
 flask-restful = "*"
 wtforms = "*"
 flask-cors = "*"
 flask-dance = "*"
 babel = "*"
+werkzeug = "==1.0.0"
 
 [dev-packages]
 

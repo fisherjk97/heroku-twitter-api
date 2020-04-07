@@ -19,7 +19,7 @@ from wtforms.validators import DataRequired, NumberRange
 from flask_cors import CORS
 from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 from flask_dance.consumer import oauth_authorized
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.datastructures import MultiDict
 from operator import itemgetter, attrgetter
 app = Flask(__name__, static_url_path="", static_folder="static")

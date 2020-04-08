@@ -24,7 +24,7 @@
 <div>
 	<form class="form form-horizontal" id="form_search_tweets" method="POST" action="{{ url_for('api_user') }}">
 		<div class="form-row">
-		  <div class="form-group col-md-6 col-sm-12 col-xs-12">
+		  <div class="form-group col-lg-10 col-md-10 col-sm-12 col-xs-12">
 			<input name="screenName" type="text" class="form-control" id="screenName" placeholder="Enter a twitter screen name like @mytwitterhandle">
 		  </div>
 		  <div class="col-md-2 input-append">
@@ -39,8 +39,6 @@
 
 
 	<div class="row">
-		<h3 class="text-primary">User</h3>
-		<div class="card-columns">
 		<div class="card">
 			<img src={{user.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 			<div class="card-body">
@@ -51,12 +49,13 @@
 				<h5 class="card-title"><a href='https://twitter.com/{{user.screen_name}}'>@{{user.screen_name}}</a></h5>
 				<p class="card-text">{{user.description}}</p>
 				<p class="card-text"><small class="text-primary">Last tweeted {{user.last_tweeted|datetime('shorttime')}}</small></p>
-				<a href='https://twitter.com/{{user.screen_name}}'>
-					<button id="submitBtn" type="submit" class="form-control btn btn-dark">View Profile</button>
-				</a>
+				<div >
+					<a href='https://twitter.com/{{user.screen_name}}'>
+						<button id="submitBtn" type="submit" class="form-control btn btn-dark col-md-4">View Profile</button>
+					</a>
+				</div>
 			</div>
 		</div>
-	</div>
 	</div>
 	<div class="row">
 		<h3 class="text-center text-primary">Following</h3>

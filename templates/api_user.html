@@ -37,9 +37,10 @@
 	{% if formSubmitted %}
 	<h3 class="text-center">Search Results for <span class="text-primary">'{{screen_name}}'</span></h3>
 
-
+	
 	<div class="row">
-		<div class="card">
+		<div class="card-columns">
+		<div class="card shadow p-2 mb-5 bg-white rounded">
 			<img src={{user.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 			<div class="card-body">
 				<a href='https://twitter.com/{{user.screen_name}}'>
@@ -48,21 +49,26 @@
 				<h5 class="card-title">{{user.name}}</h5>
 				<h5 class="card-title"><a href='https://twitter.com/{{user.screen_name}}'>@{{user.screen_name}}</a></h5>
 				<p class="card-text">{{user.description}}</p>
-				<p class="card-text"><small class="text-primary">Last tweeted {{user.last_tweeted|datetime('shorttime')}}</small></p>
 				<div >
 					<a href='https://twitter.com/{{user.screen_name}}'>
-						<button id="submitBtn" type="submit" class="form-control btn btn-dark col-md-4">View Profile</button>
+						<button id="submitBtn" type="submit" class="form-control btn btn-primary">View Profile</button>
 					</a>
 				</div>
 			</div>
+			<div class="card-footer bg-white">
+				<small class="text-primary">Last tweeted {{user.last_tweeted|datetime('shorttime')}}</small>
+			  </div>
 		</div>
+	</div>
 	</div>
 	<div class="row">
 		<h3 class="text-center text-primary">Following</h3>
 			<div class="card-columns">
 				{% for x in friends  | sort(attribute='last_tweeted', reverse= True) %}
-				<div class="card">
-					<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
+				<div class="card shadow p-2 mb-5 bg-white rounded">
+					<div class="">
+						<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
+					</div>
 					<div class="card-body">
 						<a href='https://twitter.com/{{x.screen_name}}'>
 							<img class="mr-3 rounded-circle" src={{x.profile_image_url_lg|tojson|safe}} alt={{x.screen_name}} >
@@ -70,11 +76,13 @@
 						<h5 class="card-title">{{x.name}}</h5>
 						<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 						<p class="card-text">{{x.description}}</p>
-						<p class="card-text"><small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
 						<a href='https://twitter.com/{{x.screen_name}}'>
-							<button id="submitBtn" type="submit" class="form-control btn btn-dark">View Profile</button>
+							<button id="submitBtn" type="submit" class="form-control btn btn-primary">View Profile</button>
 						</a>
 					</div>
+					<div class="card-footer bg-white">
+						<small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small>
+					  </div>
 				</div>
 				{% endfor %}
 		</div>
@@ -83,7 +91,7 @@
 		<h3 class="text-center text-primary">Followers</h3>
 		<div class="card-columns">
 			{% for x in followers  | sort(attribute='last_tweeted', reverse= True)%}
-			<div class="card">
+			<div class="card shadow p-2 mb-5 bg-white rounded">
 				<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 				<div class="card-body">
 					<a href='https://twitter.com/{{x.screen_name}}'>
@@ -92,11 +100,13 @@
 					<h5 class="card-title">{{x.name}}</h5>
 					<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 					<p class="card-text">{{x.description}}</p>
-					<p class="card-text"><small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small></p>
 					<a href='https://twitter.com/{{x.screen_name}}'>
-						<button id="submitBtn" type="submit" class="form-control btn btn-dark">View Profile</button>
+						<button id="submitBtn" type="submit" class="form-control btn btn-primary">View Profile</button>
 					</a>
 				</div>
+				<div class="card-footer bg-white">
+					<small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small>
+				  </div>
 			</div>
 			{% endfor %}
 	</div>

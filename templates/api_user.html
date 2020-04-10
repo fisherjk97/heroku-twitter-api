@@ -34,6 +34,9 @@
 	</form>
 	
 	</div>
+	{%if message %}
+	<h3 class="text-center">{{message}}</h3>
+	{% endif %}
 	{% if formSubmitted %}
 	<h3 class="text-center">Search Results for <span class="text-primary">'{{screen_name}}'</span></h3>
 

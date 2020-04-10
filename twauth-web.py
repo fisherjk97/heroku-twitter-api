@@ -180,50 +180,56 @@ def start():
 @app.route("/api_user", methods=['GET', 'POST'])
 def api_user():
     form = UserForm(request.form)
-    if request.method == 'POST' and form.validate():
-        screen_name = form.screenName.data
+    try:
+        if request.method == 'POST' and form.validate():
+            screen_name = form.screenName.data
 
-        ###resp = twitter.get("account/verify_credentials.json")
-        ##screen_name = resp.json()["screen_name"]
-        #name = resp.json()["name"]
-        #count = 20
-        cleaned_screen_name = screen_name.replace("@", "")
-        queryString = "?screen_name=" + cleaned_screen_name + "&count=20"
+            ###resp = twitter.get("account/verify_credentials.json")
+            ##screen_name = resp.json()["screen_name"]
+            #name = resp.json()["name"]
+            #count = 20
+            cleaned_screen_name = screen_name.replace("@", "")
+            queryString = "?screen_name=" + cleaned_screen_name + "&count=20"
 
-        resp_friends = twitter.get("friends/list.json" + queryString)
-        resp_followers = twitter.get("followers/list.json" + queryString)
- 
-        resp_screenName = twitter.get("users/show.json" + "?screen_name=" + cleaned_screen_name) 
-        user = get_user_info(resp_screenName)
-        friends = get_accounts(resp_friends)
-        followers = get_accounts(resp_followers)
+            resp_friends = twitter.get("friends/list.json" + queryString)
+            resp_followers = twitter.get("followers/list.json" + queryString)
+    
+            resp_screenName = twitter.get("users/show.json" + "?screen_name=" + cleaned_screen_name) 
+            user = get_user_info(resp_screenName)
+            friends = get_accounts(resp_friends)
+            followers = get_accounts(resp_followers)
 
-        form = UserForm()
+            form = UserForm()
 
-        return render_template('api_user.html', form=form, formSubmitted=True, screen_name=screen_name, user=user, friends=friends, followers=followers)
-    else:
-        return render_template('api_user.html', form=form, formSubmitted=False)
+            return render_template('api_user.html', form=form, formSubmitted=True, message = "", screen_name=screen_name, user=user, friends=friends, followers=followers)
+        else:
+            return render_template('api_user.html', form=form, formSubmitted=False, message = "")
+    except:
+         return render_template('api_user.html', form=form, formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
 
 @app.route("/api_pictures", methods=['GET', 'POST'])
 def api_pictures():
     form = TweetForm(request.form)
     formSubmitted = False
-    if request.method == 'POST' and form.validate():
-        q = form.hashtag.data
-        count = form.count.data
-        
-        response = search_tweets(q, count)
-        ##data = jsonify(response.text).json
-        media = get_hashtag_media(response.content)
+    try:
+        if request.method == 'POST' and form.validate():
+            q = form.hashtag.data
+            count = form.count.data
+            
+            response = search_tweets(q, count)
+            ##data = jsonify(response.text).json
+            media = get_hashtag_media(response.content)
 
-        nFound = len(media)
-        formSubmitted = True
-        message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-        form = TweetForm()
-        return render_template('api_pictures.html', images=media, form=form, formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
-    
-    else:
-        return render_template('api_pictures.html', form=form)
+            nFound = len(media)
+            formSubmitted = True
+            message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
+            form = TweetForm()
+            return render_template('api_pictures.html', images=media, form=form,message = "", formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
+        
+        else:
+            return render_template('api_pictures.html', form=form, formSubmitted=False, message = "")
+    except:
+        return render_template('api_pictures.html', form=form, formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
     
 @app.route('/twitter_api', methods=['GET', 'POST'])
 def twitter_api():

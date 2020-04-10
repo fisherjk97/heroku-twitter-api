@@ -325,7 +325,7 @@ def parse_account(account):
         if('profile_banner_url' in account):
             profile_image_banner_url = account['profile_banner_url']
         else:
-            profile_image_banner_url = account['profile_background_image_url_https']
+            profile_image_banner_url = "https://via.placeholder.com/1500x500.png/007BFF/FFFFFF/?text=Image%20Not%20Found"
         #profile_image_banner_url = account['profile_banner_url'] if account['profile_banner_url'] != None else ""
         friends_count = account['friends_count']
         followers_count = account['followers_count']

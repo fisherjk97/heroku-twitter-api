@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask, redirect, session, render_template, request, url_for, jsonify, make_response, flash
 import oauth2 as oauth
 import urllib.request
@@ -12,8 +13,11 @@ import re
 import base64 
 import time
 import babel
-from babel.dates import format_date, format_datetime
-from datetime import datetime
+import datetime, pytz
+from pytz import timezone
+from datetime import datetime, timezone
+from datetime import date, datetime, time
+from babel.dates import format_date, format_datetime, format_time
 from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
 from wtforms.validators import DataRequired, NumberRange
 from flask_cors import CORS
@@ -72,16 +76,24 @@ class UserForm(Form):
     screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "@twitterhandle"})
     
 
+def utc_to_local(utc_dt):
+    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+
 ###format date - http://babel.pocoo.org/en/latest/dates.html
 @app.template_filter('datetime')
-def format_datetime(value, format='medium'):
+def format_datetime(value, format='default'):
+
+    ts = datetime.strptime(value,'%a %b %d %H:%M:%S +0000 %Y')
+    local_ts = utc_to_local(ts)
+    #mountain = babel.dates.get_timezone('US/Mountain')
     if format == 'full':
         format="EEEE, d. MMMM y 'at' HH:mm"
     elif format == 'medium':
         format="EE dd.MM.y HH:mm"
-    elif format == 'shorttime':
+    else:
         format="M/d/y @ h:mm a"
-    return babel.dates.format_datetime(value, format)
+
+    return babel.dates.format_datetime(local_ts, format)
 
 
 def set_date(date_str):
@@ -128,9 +140,9 @@ class Account():
     profile_image_banner_url = ""
     friends_count = 0
     followers_count = 0
-    last_tweeted = ""
+    create_date = ""
     
-    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, last_tweeted):
+    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, create_date):
         self.account_id = account_id
         self.screen_name = screen_name
         self.name = name
@@ -141,9 +153,7 @@ class Account():
         self.profile_image_banner_url = profile_image_banner_url
         self.friends_count = friends_count
         self.followers_count = followers_count
-        self.last_tweeted = set_date(last_tweeted)
-       
-
+        self.create_date = create_date
 
     def __hash__(self):
         return hash(
@@ -155,7 +165,8 @@ class Account():
                 'profile_image_url', self.profile_image_url,
                 'profile_image_banner_url', self.profile_image_banner_url,
                 'friends_count', self.friends_count,
-                'followers_count',  self.followers_count
+                'followers_count',  self.followers_count,
+                'create_date', self.create_date
                  ))
 
     def __eq__(self, other):
@@ -180,32 +191,48 @@ def start():
 @app.route("/api_user", methods=['GET', 'POST'])
 def api_user():
     form = UserForm(request.form)
-    try:
-        if request.method == 'POST' and form.validate():
-            screen_name = form.screenName.data
+    message = ""
+    if request.method == 'POST' and form.validate():
+        screen_name = form.screenName.data
 
-            ###resp = twitter.get("account/verify_credentials.json")
-            ##screen_name = resp.json()["screen_name"]
-            #name = resp.json()["name"]
-            #count = 20
-            cleaned_screen_name = screen_name.replace("@", "")
-            queryString = "?screen_name=" + cleaned_screen_name + "&count=20"
-
-            resp_friends = twitter.get("friends/list.json" + queryString)
-            resp_followers = twitter.get("followers/list.json" + queryString)
-    
+        ###resp = twitter.get("account/verify_credentials.json")
+        ##screen_name = resp.json()["screen_name"]
+        #name = resp.json()["name"]
+        #count = 20
+        cleaned_screen_name = screen_name.replace("@", "")
+        queryString = "?screen_name=" + cleaned_screen_name + "&count=20"
+        
+        user = None
+        friends = []
+        followers = []
+        try:
             resp_screenName = twitter.get("users/show.json" + "?screen_name=" + cleaned_screen_name) 
             user = get_user_info(resp_screenName)
+        except:
+            message += "Unable to get user information."
+            print(sys.exc_info()[0])
+        try:
+            resp_friends = twitter.get("friends/list.json" + queryString)
             friends = get_accounts(resp_friends)
+        except:
+            message += "Unable to retrieve friends."
+            print(sys.exc_info()[0])
+        try:
+            resp_followers = twitter.get("followers/list.json" + queryString)
             followers = get_accounts(resp_followers)
+        except:
+            message += "Unable to retrieve followers."
+            print(sys.exc_info()[0])
+        
+        #user = get_user_info(resp_screenName)
+        #friends = get_accounts(resp_friends)
+        #followers = get_accounts(resp_followers)
 
-            form = UserForm()
+        form = UserForm()
 
-            return render_template('api_user.html', form=form, formSubmitted=True, message = "", screen_name=screen_name, user=user, friends=friends, followers=followers)
-        else:
-            return render_template('api_user.html', form=form, formSubmitted=False, message = "")
-    except:
-         return render_template('api_user.html', form=form, formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
+        return render_template('api_user.html', form=form, formSubmitted=True, message = message, screen_name=screen_name, user=user, friends=friends, followers=followers)
+    else:
+        return render_template('api_user.html', form=form, formSubmitted=False, message = message)
 
 @app.route("/api_pictures", methods=['GET', 'POST'])
 def api_pictures():
@@ -336,14 +363,14 @@ def parse_account(account):
         friends_count = account['friends_count']
         followers_count = account['followers_count']
 
-        last_tweeted = None
+        create_date = ""
         if 'status' in account:
             tweet = account["status"]
-            last_tweeted = tweet['created_at']
-
-        response_account = Account(account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, last_tweeted)
-
-    return response_account
+            create_date = tweet['created_at']
+        
+        return Account(account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, create_date)
+    else:
+        return None
 
 def get_user_info(response):
     a = json.loads(response.content)

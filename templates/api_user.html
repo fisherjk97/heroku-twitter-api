@@ -59,7 +59,7 @@
 				</div>
 			</div>
 			<div class="card-footer bg-white">
-				<small class="text-primary">Last tweeted {{user.last_tweeted|datetime('shorttime')}}</small>
+				<small class="text-primary">Last tweeted {{user.create_date|datetime}}</small>
 			  </div>
 		</div>
 	</div>
@@ -67,7 +67,7 @@
 	<div class="row">
 		<h3 class="text-center text-primary">Following</h3>
 			<div class="card-columns">
-				{% for x in friends  | sort(attribute='last_tweeted', reverse= True) %}
+				{% for x in friends  | sort(attribute='create_date', reverse= True) %}
 				<div class="card shadow p-2 mb-5 bg-white rounded zoom">
 					<div class="">
 						<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
@@ -84,7 +84,7 @@
 						</a>
 					</div>
 					<div class="card-footer bg-white">
-						<small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small>
+						<small class="text-primary">Last tweeted {{x.create_date|datetime}}</small>
 					  </div>
 				</div>
 				{% endfor %}
@@ -93,7 +93,7 @@
 	<div class="row">
 		<h3 class="text-center text-primary">Followers</h3>
 		<div class="card-columns">
-			{% for x in followers  | sort(attribute='last_tweeted', reverse= True)%}
+			{% for x in followers  | sort(attribute='create_date', reverse= True)%}
 			<div class="card shadow p-2 mb-5 bg-white rounded zoom">
 				<img src={{x.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 				<div class="card-body">
@@ -108,7 +108,7 @@
 					</a>
 				</div>
 				<div class="card-footer bg-white">
-					<small class="text-primary">Last tweeted {{x.last_tweeted|datetime('shorttime')}}</small>
+					<small class="text-primary">Last tweeted {{x.create_date|datetime}}</small>
 				  </div>
 			</div>
 			{% endfor %}

@@ -11,16 +11,9 @@ import urllib
 from flask_restful import Resource, Api
 import re
 import base64 
-import time
-import babel
-import datetime, pytz
-from static.modules import helper
-from pytz import timezone
-from datetime import datetime, timezone
-from datetime import date, datetime, time
-from babel.dates import format_date, format_datetime, format_time
-from wtforms import Form, BooleanField, TextField, StringField, IntegerField, validators
-from wtforms.validators import DataRequired, NumberRange
+from static.modules import utils
+from static.modules.models import Account, Tweet
+from static.modules.forms import UserForm, TweetForm
 from flask_cors import CORS
 from flask_dance.contrib.twitter import make_twitter_blueprint, twitter
 from flask_dance.consumer import oauth_authorized
@@ -65,115 +58,7 @@ twitter_bp =  make_twitter_blueprint(
 )
 app.register_blueprint(twitter_bp, url_prefix="/login")
 
-
-
 oauth_store = {}
-
-class TweetForm(Form):
-    hashtag  = TextField(u'Hashtag(s)', validators=[DataRequired()], render_kw={"placeholder": "#Cool #Pictures @twitterhandle"})
-    count = IntegerField(u'How Many?', validators=[DataRequired(), NumberRange(min=1, max=100, message='Must be between 1 and 100')], render_kw={"placeholder": "Think of a number 1-100"})
-
-class UserForm(Form):
-    screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "@twitterhandle"})
-    
-
-#def utc_to_local(utc_dt):
- #   return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
-
-###format date - http://babel.pocoo.org/en/latest/dates.html
-@app.template_filter('datetime')
-def format_datetime(value, format='default'):
-    """format datetime"""
-    ts = datetime.strptime(value,'%a %b %d %H:%M:%S +0000 %Y')
-    local_ts = helper.utc_to_local(ts)
-    #mountain = babel.dates.get_timezone('US/Mountain')
-    if format == 'full':
-        format="EEEE, d. MMMM y 'at' HH:mm"
-    elif format == 'medium':
-        format="EE dd.MM.y HH:mm"
-    else:
-        format="M/d/y @ h:mm a"
-
-    return babel.dates.format_datetime(local_ts, format)
-
-
-def set_date(date_str):
-        """Convert twitter datestring to datetime
-        """
-        time_struct = time.strptime(date_str, "%a %b %d %H:%M:%S +0000 %Y")#Tue Apr 26 08:57:55 +0000 2011
-        return datetime.fromtimestamp(time.mktime(time_struct))
-
-class Tweet():
-    media_id = ""
-    media_url = ""
-    text = ""
-    src = ""
-    media_url_lg = ""
-  
-
-    
-    def __init__(self, media_id, media_url, text, src):
-        self.media_id = media_id
-        self.media_url = media_url
-        self.text = text
-        self.src = src
-        self.media_url_lg = self.media_url + ":large"
-
-
-    def __hash__(self):
-        return hash(('media_id', self.media_id,
-                 'media_url', self.media_url,
-                 'text', self.text,
-                 'src', self.src))
-
-    def __eq__(self, other):
-        return self.media_id == other.media_id
-
-
-class Account():
-    account_id = ""
-    screen_name = ""
-    name = ""
-    description = ""
-    profile_url = ""
-    profile_image_url = "" 
-    profile_image_url_lg = "" 
-    profile_image_banner_url = ""
-    friends_count = 0
-    followers_count = 0
-    create_date = ""
-    
-    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, create_date):
-        self.account_id = account_id
-        self.screen_name = screen_name
-        self.name = name
-        self.description = description
-        self.profile_url = profile_url
-        self.profile_image_url = profile_image_url
-        self.profile_image_url_lg = self.profile_image_url.replace("_normal", "_bigger")
-        self.profile_image_banner_url = profile_image_banner_url
-        self.friends_count = friends_count
-        self.followers_count = followers_count
-        self.create_date = create_date
-
-    def __hash__(self):
-        return hash(
-                ('account_id', self.account_id,
-                 'screen_name', self.screen_name,
-                 'name', self.name,
-                 'description',self.description,
-                'profile_url', self.profile_url,
-                'profile_image_url', self.profile_image_url,
-                'profile_image_banner_url', self.profile_image_banner_url,
-                'friends_count', self.friends_count,
-                'followers_count',  self.followers_count,
-                'create_date', self.create_date
-                 ))
-
-    def __eq__(self, other):
-        return self.account_id == other.account_id
-
-
 
 @app.route("/")
 def index():
@@ -193,47 +78,36 @@ def start():
 def api_user():
     form = UserForm(request.form)
     message = ""
-    if request.method == 'POST' and form.validate():
-        screen_name = form.screenName.data
+    count = 20
+    try:
+        if request.method == 'POST' and form.validate():
+            screen_name = form.screenName.data
 
-        ###resp = twitter.get("account/verify_credentials.json")
-        ##screen_name = resp.json()["screen_name"]
-        #name = resp.json()["name"]
-        #count = 20
-        cleaned_screen_name = screen_name.replace("@", "")
-        queryString = "?screen_name=" + cleaned_screen_name + "&count=20"
+            cleaned_screen_name = screen_name.replace("@", "")
+            queryString = "?screen_name=" + cleaned_screen_name + "&count=" + str(count)
+            
+            user = None
+            friends = []
+            followers = []
         
-        user = None
-        friends = []
-        followers = []
-        try:
             resp_screenName = twitter.get("users/show.json" + "?screen_name=" + cleaned_screen_name) 
             user = get_user_info(resp_screenName)
-        except:
-            message += "Unable to get user information."
-            print(sys.exc_info()[0])
-        try:
+        
             resp_friends = twitter.get("friends/list.json" + queryString)
             friends = get_accounts(resp_friends)
-        except:
-            message += "Unable to retrieve friends."
-            print(sys.exc_info()[0])
-        try:
+        
             resp_followers = twitter.get("followers/list.json" + queryString)
             followers = get_accounts(resp_followers)
-        except:
-            message += "Unable to retrieve followers."
-            print(sys.exc_info()[0])
-        
-        #user = get_user_info(resp_screenName)
-        #friends = get_accounts(resp_friends)
-        #followers = get_accounts(resp_followers)
+            
 
-        form = UserForm()
+            form = UserForm()
 
-        return render_template('api_user.html', form=form, formSubmitted=True, message = message, screen_name=screen_name, user=user, friends=friends, followers=followers)
-    else:
-        return render_template('api_user.html', form=form, formSubmitted=False, message = message)
+            return render_template('api_user.html', form=form, formSubmitted=True, message = message, screen_name=screen_name, user=user, friends=friends, followers=followers)
+        else:
+            return render_template('api_user.html', form=form, formSubmitted=False, message = message)
+    except:
+        return render_template('api_user.html', form=form, formSubmitted=False, message = "Oops! Something went wrong. Please try again later")
+
 
 @app.route("/api_pictures", methods=['GET', 'POST'])
 def api_pictures():
@@ -289,12 +163,10 @@ def twitter_image():
 def internal_server_error(e):
     return render_template('error.html', error_message='uncaught exception'), 500
 
-
-def write_to_json_file(name, data):
-     with open(name, 'w') as f:
-        
-        json.dump(data, f)
-        
+@app.template_filter('datetime')
+def format_twitter_date(value, format='default'):
+    """format datetime"""
+    return utils.format_twitter_date(value, format)
 
 def get_hashtag_media(response):
     tweets = json.loads(response)

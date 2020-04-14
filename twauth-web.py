@@ -14,6 +14,7 @@ import base64
 import time
 import babel
 import datetime, pytz
+from static.modules import helper
 from pytz import timezone
 from datetime import datetime, timezone
 from datetime import date, datetime, time
@@ -76,15 +77,15 @@ class UserForm(Form):
     screenName  = TextField(u'Screen Name', validators=[DataRequired()], render_kw={"placeholder": "@twitterhandle"})
     
 
-def utc_to_local(utc_dt):
-    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+#def utc_to_local(utc_dt):
+ #   return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
 ###format date - http://babel.pocoo.org/en/latest/dates.html
 @app.template_filter('datetime')
 def format_datetime(value, format='default'):
-
+    """format datetime"""
     ts = datetime.strptime(value,'%a %b %d %H:%M:%S +0000 %Y')
-    local_ts = utc_to_local(ts)
+    local_ts = helper.utc_to_local(ts)
     #mountain = babel.dates.get_timezone('US/Mountain')
     if format == 'full':
         format="EEEE, d. MMMM y 'at' HH:mm"

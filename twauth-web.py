@@ -54,7 +54,7 @@ app.config.from_pyfile('config.cfg', silent=True)
 twitter_bp =  make_twitter_blueprint(
     api_key=app.config['APP_CONSUMER_KEY'],
     api_secret=app.config['APP_CONSUMER_SECRET'],
-    redirect_url="/twitter_api"
+    redirect_url="/api"
 )
 app.register_blueprint(twitter_bp, url_prefix="/login")
 
@@ -74,14 +74,20 @@ def start():
     assert resp.ok
     return redirect(url_for('twitter_api'))
 
-@app.route("/api_user", methods=['GET', 'POST'])
+@app.route('/api', methods=['GET', 'POST'])
+def twitter_api():
+    form = TweetForm(request.form)
+    return render_template('twitter_api.html', form=form)
+
+
+@app.route("/api/user", methods=['GET', 'POST'])
 def api_user():
     form = UserForm(request.form)
     message = ""
     count = 20
     try:
-        if request.method == 'POST' and form.validate():
-            screen_name = form.screenName.data
+        if request.method == 'GET' and request.args:
+            screen_name = request.args.get('screenName')
 
             cleaned_screen_name = screen_name.replace("@", "")
             queryString = "?screen_name=" + cleaned_screen_name + "&count=" + str(count)
@@ -109,14 +115,14 @@ def api_user():
         return render_template('api/user.html', form=form, formSubmitted=False, message = "Oops! Something went wrong. Please try again later")
 
 
-@app.route("/api_pictures", methods=['GET', 'POST'])
+@app.route("/api/pictures", methods=['GET', 'POST'])
 def api_pictures():
     form = TweetForm(request.form)
     formSubmitted = False
     try:
-        if request.method == 'POST' and form.validate():
-            q = form.hashtag.data
-            count = form.count.data
+        if request.method == 'GET' and request.args:
+            q = request.args.get('hashtag')
+            count = request.args.get('count')
             
             response = search_tweets(q, count)
             ##data = jsonify(response.text).json
@@ -133,32 +139,6 @@ def api_pictures():
     except:
         return render_template('api/pictures.html', form=form, formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
     
-@app.route('/twitter_api', methods=['GET', 'POST'])
-def twitter_api():
-    form = TweetForm(request.form)
-    return render_template('twitter_api.html', form=form)
-
-@app.route('/twitter_image', methods=['GET', 'POST'])
-def twitter_image():
-    form = TweetForm(request.form)
-    formSubmitted = False
-    if request.method == 'POST' and form.validate():
-        q = form.hashtag.data
-        count = form.count.data
-        
-        response = search_tweets(q, count)
-        ##data = jsonify(response.text).json
-        media = get_hashtag_media(response.content)
-
-        nFound = len(media)
-        formSubmitted = True
-        message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-        form = TweetForm()
-        return render_template('twitter_api_full.html', images=media, form=form, formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
-    
-    else:
-        return render_template('twitter_api_full.html', form=form)
-
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('error.html', error_message='uncaught exception'), 500

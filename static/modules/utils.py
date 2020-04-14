@@ -25,6 +25,16 @@ def format_twitter_date(value, format='default'):
 
     return babel.dates.format_datetime(local_ts, format)
 
+def to_json(content):
+    response = content
+    try:
+        response = content.decode('utf-8')
+    except:
+        print("Exception")
+    finally:
+        return json.loads(response)
+  
+
 def write_to_json_file(name, data):
      with open(name, 'w') as f:
         json.dump(data, f)

@@ -1,5 +1,4 @@
 import os
-import sys
 from flask import Flask, redirect, session, render_template, request, url_for, jsonify, make_response, flash
 import oauth2 as oauth
 import urllib.request
@@ -8,9 +7,9 @@ import urllib.error
 import json
 import urllib.parse
 import urllib
-from flask_restful import Resource, Api
 import re
 import base64 
+from flask_restful import Resource, Api
 from static.modules import utils
 from static.modules.models import Account, Tweet
 from static.modules.forms import UserForm, TweetForm
@@ -21,6 +20,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.datastructures import MultiDict
 from operator import itemgetter, attrgetter
 from flask_fontawesome import FontAwesome
+
 app = Flask(__name__, static_url_path="", static_folder="static")
 app.wsgi_app = ProxyFix(app.wsgi_app)
 
@@ -102,11 +102,11 @@ def api_user():
 
             form = UserForm()
 
-            return render_template('api_user.html', form=form, formSubmitted=True, message = message, screen_name=screen_name, user=user, friends=friends, followers=followers)
+            return render_template('api/user.html', form=form, formSubmitted=True, message = message, screen_name=screen_name, user=user, friends=friends, followers=followers)
         else:
-            return render_template('api_user.html', form=form, formSubmitted=False, message = message)
+            return render_template('api/user.html', form=form, formSubmitted=False, message = message)
     except:
-        return render_template('api_user.html', form=form, formSubmitted=False, message = "Oops! Something went wrong. Please try again later")
+        return render_template('api/user.html', form=form, formSubmitted=False, message = "Oops! Something went wrong. Please try again later")
 
 
 @app.route("/api_pictures", methods=['GET', 'POST'])
@@ -126,12 +126,12 @@ def api_pictures():
             formSubmitted = True
             message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
             form = TweetForm()
-            return render_template('api_pictures.html', images=media, form=form,message = "", formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
+            return render_template('api/pictures.html', images=media, form=form,message = "", formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
         
         else:
-            return render_template('api_pictures.html', form=form, formSubmitted=False, message = "")
+            return render_template('api/pictures.html', form=form, formSubmitted=False, message = "")
     except:
-        return render_template('api_pictures.html', form=form, formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
+        return render_template('api/pictures.html', form=form, formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
     
 @app.route('/twitter_api', methods=['GET', 'POST'])
 def twitter_api():
@@ -263,16 +263,6 @@ def search_tweets(q, count):
 def get_user(user_id):
     url = show_user_url + '?user_id=' + user_id
     return twitter.get(url)
-
-def to_json(content):
-    response = content
-    try:
-        response = content.decode('utf-8')
-    except:
-        print("Exception")
-    finally:
-        return json.loads(response)
-  
 
  
 if __name__ == '__main__':

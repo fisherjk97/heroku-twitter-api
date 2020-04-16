@@ -32,15 +32,13 @@
 		</div>
 		</div>
 	</form>
-	</div>
-	{%if message %}
-	<h3 class="text-center">{{message}}</h3>
-	{% endif %}
-	{% if formSubmitted %}
-
-	
+	</div>	
+	{%if formSubmitted %}
 	<div class="row">
-		<div class="">
+		{%if user_message %}
+		<br/><h3 class="text-danger">{{user_message}}</h3>
+		{% else %}
+
 		<div class="card shadow p-2 mb-5 bg-white rounded zoom">
 			<img src={{user.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 			<div class="card-body">
@@ -68,10 +66,14 @@
 				<small class="text-primary">Last tweeted {{user.create_date|datetime}}</small>
 			  </div>
 		</div>
+		{% endif %}
 	</div>
-	</div>
+	
 	<div class="row">
 		<h3 class="text-center text-primary">Following</h3>
+			{%if friend_message %}
+			<br/><h3 class="text-danger">{{friend_message}}</h3>
+			{% else %}
 			<div class="card-columns">
 				{% for x in friends  | sort(attribute='create_date', reverse= True) %}
 				<div class="card shadow p-2 mb-5 bg-white rounded zoom">
@@ -96,9 +98,13 @@
 				</div>
 				{% endfor %}
 		</div>
+		{% endif %}
 	</div>
 	<div class="row">
 		<h3 class="text-center text-primary">Followers</h3>
+		{%if follower_message %}
+		<br/><h3 class="text-danger">{{follower_message}}</h3>
+		{% else %}
 		<div class="card-columns">
 			{% for x in followers  | sort(attribute='create_date', reverse= True)%}
 			<div class="card shadow p-2 mb-5 bg-white rounded zoom">
@@ -121,6 +127,7 @@
 			</div>
 			{% endfor %}
 	</div>
+	{% endif %}
 </div>
 {% endif %}
 {% endblock %}

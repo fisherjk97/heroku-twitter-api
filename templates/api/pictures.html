@@ -38,15 +38,6 @@
 	</form>
 	
     </div>
-<!--
-<div>
-	{% for field, errors in form.errors.items() %}
-    <div class="alert alert-error">
-        {{ form[field].label }}: {{ ', '.join(errors) }}
-    </div>
-    {% endfor %}
-</div>
--->
 {%if message %}
 	<h3 class="text-center">{{message}}</h3>
 	{% endif %}

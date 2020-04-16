@@ -84,6 +84,9 @@ def twitter_api():
 @app.route("/api/user", methods=['GET', 'POST'])
 def api_user():
     message = ""
+    user_message = ""
+    friend_message = ""
+    follower_message = ""
     count = 20
     try:
         if request.method == 'GET' and request.args:
@@ -100,31 +103,30 @@ def api_user():
             if(resp_screenName.ok):
                 user = get_user_info(resp_screenName)
             else:
-                message += "Unable to get user information. "
+                user_message = resp_screenName.reason
         
             resp_friends = twitter.get("friends/list.json" + queryString)
             if(resp_friends.ok):
                 friends = get_accounts(resp_friends)
             else:
-                message += "Unable to get friend information. "  
+                friend_message = resp_friends.reason
             
             resp_followers = twitter.get("followers/list.json" + queryString)
             if(resp_followers.ok):
                 followers = get_accounts(resp_followers)
             else:
-                message += "Unable to get follower information."
+                follower_message = resp_followers.reason
 
-            return render_template('api/user.html', formSubmitted=True, message = message, user=user, friends=friends, followers=followers)
+            return render_template('api/user.html', formSubmitted=True, user=user, friends=friends, followers=followers, user_message = user_message, friend_message = friend_message, follower_message = follower_message)
         else:
-            return render_template('api/user.html', formSubmitted=False, message = message)
+            return render_template('api/user.html', formSubmitted=False, user_message = user_message, friend_message = friend_message, follower_message = follower_message)
     except:
         print( sys.exc_info()[0])
-        return render_template('api/user.html', formSubmitted=False, message = "Oops! Something went wrong. Please try again later")
+        return render_template('api/user.html', formSubmitted=False,user_message = user_message, friend_message = friend_message, follower_message = follower_message)
 
 
 @app.route("/api/pictures", methods=['GET', 'POST'])
 def api_pictures():
-    form = TweetForm(request.form)
     formSubmitted = False
     try:
         if request.method == 'GET' and request.args:
@@ -138,13 +140,12 @@ def api_pictures():
             nFound = len(media)
             formSubmitted = True
             message = "Found " + str(len(media)) + "/" + str(count) + " image(s) with search '" + q + "'"
-            form = TweetForm()
-            return render_template('api/pictures.html', images=media, form=form,message = "", formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
+            return render_template('api/pictures.html', images=media,message = "", formSubmitted=formSubmitted, q=q, count=count, nFound=nFound)
         
         else:
-            return render_template('api/pictures.html', form=form, formSubmitted=False, message = "")
+            return render_template('api/pictures.html', formSubmitted=False, message = "")
     except:
-        return render_template('api/pictures.html', form=form, formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
+        return render_template('api/pictures.html', formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
     
 @app.errorhandler(500)
 def internal_server_error(e):

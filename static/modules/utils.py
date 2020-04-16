@@ -13,17 +13,20 @@ def utc_to_local(utc_dt):
 ###format date - http://babel.pocoo.org/en/latest/dates.html
 def format_twitter_date(value, format='default'):
     """format datetime"""
-    ts = twitter_date_to_datetime(value)
-    local_ts = utc_to_local(ts)
-    
-    if format == 'full':
-        format ="EEEE, d. MMMM y 'at' HH:mm zzzz"
-    elif format == 'medium':
-        format ="EE dd.MM.y HH:mm zzzz"
-    else:
-        format="M/d/y @ h:mm a zzzz"
+    if(value):
+        ts = twitter_date_to_datetime(value)
+        local_ts = utc_to_local(ts)
+        
+        if format == 'full':
+            format ="EEEE, d. MMMM y 'at' HH:mm zzzz"
+        elif format == 'medium':
+            format ="EE dd.MM.y HH:mm zzzz"
+        else:
+            format="M/d/y @ h:mm a zzzz"
 
-    return babel.dates.format_datetime(local_ts, format)
+        return babel.dates.format_datetime(local_ts, format)
+    else:
+        return ""
 
 def to_json(content):
     response = content

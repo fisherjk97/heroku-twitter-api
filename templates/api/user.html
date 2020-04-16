@@ -37,25 +37,32 @@
 	<h3 class="text-center">{{message}}</h3>
 	{% endif %}
 	{% if formSubmitted %}
-	<h3 class="text-center">Search Results for <span class="text-primary">'{{screen_name}}'</span></h3>
 
 	
 	<div class="row">
-		<div class="card-columns">
+		<div class="">
 		<div class="card shadow p-2 mb-5 bg-white rounded zoom">
 			<img src={{user.profile_image_banner_url|tojson|safe}} class="card-img-top" alt="...">
 			<div class="card-body">
-				<a href='https://twitter.com/{{user.screen_name}}'>
-					<img class="mr-3 rounded-circle" src={{user.profile_image_url_lg|tojson|safe}} alt={{user.screen_name}} >
-				</a>
-				<h5 class="card-title">{{user.name}}</h5>
-				<h5 class="card-title"><a href='https://twitter.com/{{user.screen_name}}'>@{{user.screen_name}}</a></h5>
-				<p class="card-text">{{user.description}}</p>
-				<div >
-					<a href='https://twitter.com/{{user.screen_name}}'>
-						<button id="submitBtn" type="submit" class="form-control btn btn-primary">View Profile</button>
-					</a>
-				</div>
+				<div class="container">
+					<div class="row">
+					  	<div class="col-lg-3 col-md-2 col-sm-6">
+							<a href='https://twitter.com/{{user.screen_name}}'>
+								<img class="mr-3 rounded-circle" src={{user.profile_image_url_lg|tojson|safe}} alt={{user.screen_name}} >
+							</a>
+							<h5 class="card-title">{{user.name}}</h5>
+							<h5 class="card-title"><a href='https://twitter.com/{{user.screen_name}}'>@{{user.screen_name}}</a></h5>
+							
+						</div>
+					  	<div class="col-lg-7 col-md-8 col-sm-6">
+							<h5 class="card-text">{{user.description}}</h5>
+						</div>
+						<div class="col-lg-2 col-md-2 col-sm-6">
+							<h5 class="card-title"><span class="text-primary bold">{{user.friends_count}}</span> Following</h5>
+							<h5 class="card-title"><span class="text-primary bold">{{user.followers_count}}</span> Followers</h5>
+						</div>
+					</div>
+				  </div>
 			</div>
 			<div class="card-footer bg-white">
 				<small class="text-primary">Last tweeted {{user.create_date|datetime}}</small>
@@ -78,9 +85,10 @@
 						<h5 class="card-title">{{x.name}}</h5>
 						<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 						<p class="card-text">{{x.description}}</p>
-						<a href='https://twitter.com/{{x.screen_name}}'>
-							<button id="submitBtn" type="submit" class="form-control btn btn-primary">View Profile</button>
-						</a>
+						<form class="form form-horizontal" id="form_search_tweets" method="GET" action="{{ url_for('api_user') }}">
+							<input name="screenName" type="hidden" class="form-control" id="screenName" value=@{{x.screen_name}}>
+							<button id="submitBtn" type="submit" class="form-control btn btn-primary">View</button>
+						</form>
 					</div>
 					<div class="card-footer bg-white">
 						<small class="text-primary">Last tweeted {{x.create_date|datetime}}</small>
@@ -102,9 +110,10 @@
 					<h5 class="card-title">{{x.name}}</h5>
 					<h5 class="card-title"><a href='https://twitter.com/{{x.screen_name}}'>@{{x.screen_name}}</a></h5>
 					<p class="card-text">{{x.description}}</p>
-					<a href='https://twitter.com/{{x.screen_name}}'>
-						<button id="submitBtn" type="submit" class="form-control btn btn-primary">View Profile</button>
-					</a>
+					<form class="form form-horizontal" id="form_search_tweets" method="GET" action="{{ url_for('api_user') }}">
+						<input name="screenName" type="hidden" class="form-control" id="screenName" value=@{{x.screen_name}}>
+						<button id="submitBtn" type="submit" class="form-control btn btn-primary">View</button>
+					</form>
 				</div>
 				<div class="card-footer bg-white">
 					<small class="text-primary">Last tweeted {{x.create_date|datetime}}</small>

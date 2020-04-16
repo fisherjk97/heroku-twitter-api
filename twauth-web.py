@@ -1,3 +1,4 @@
+import sys
 import os
 from flask import Flask, redirect, session, render_template, request, url_for, jsonify, make_response, flash
 import oauth2 as oauth
@@ -82,7 +83,6 @@ def twitter_api():
 
 @app.route("/api/user", methods=['GET', 'POST'])
 def api_user():
-    form = UserForm(request.form)
     message = ""
     count = 20
     try:
@@ -97,22 +97,29 @@ def api_user():
             followers = []
         
             resp_screenName = twitter.get("users/show.json" + "?screen_name=" + cleaned_screen_name) 
-            user = get_user_info(resp_screenName)
+            if(resp_screenName.ok):
+                user = get_user_info(resp_screenName)
+            else:
+                message += "Unable to get user information. "
         
             resp_friends = twitter.get("friends/list.json" + queryString)
-            friends = get_accounts(resp_friends)
-        
-            resp_followers = twitter.get("followers/list.json" + queryString)
-            followers = get_accounts(resp_followers)
+            if(resp_friends.ok):
+                friends = get_accounts(resp_friends)
+            else:
+                message += "Unable to get friend information. "  
             
+            resp_followers = twitter.get("followers/list.json" + queryString)
+            if(resp_followers.ok):
+                followers = get_accounts(resp_followers)
+            else:
+                message += "Unable to get follower information."
 
-            form = UserForm()
-
-            return render_template('api/user.html', form=form, formSubmitted=True, message = message, screen_name=screen_name, user=user, friends=friends, followers=followers)
+            return render_template('api/user.html', formSubmitted=True, message = message, user=user, friends=friends, followers=followers)
         else:
-            return render_template('api/user.html', form=form, formSubmitted=False, message = message)
+            return render_template('api/user.html', formSubmitted=False, message = message)
     except:
-        return render_template('api/user.html', form=form, formSubmitted=False, message = "Oops! Something went wrong. Please try again later")
+        print( sys.exc_info()[0])
+        return render_template('api/user.html', formSubmitted=False, message = "Oops! Something went wrong. Please try again later")
 
 
 @app.route("/api/pictures", methods=['GET', 'POST'])

@@ -77,12 +77,16 @@ def start():
 
 @app.route('/api', methods=['GET', 'POST'])
 def twitter_api():
+    if not twitter.authorized:
+        return redirect(url_for("twitter.login"))
     form = TweetForm(request.form)
     return render_template('twitter_api.html', form=form)
 
 
 @app.route("/api/user", methods=['GET', 'POST'])
 def api_user():
+    if not twitter.authorized:
+        return redirect(url_for("twitter.login"))
     message = ""
     user_message = ""
     friend_message = ""
@@ -127,6 +131,8 @@ def api_user():
 
 @app.route("/api/pictures", methods=['GET', 'POST'])
 def api_pictures():
+    if not twitter.authorized:
+        return redirect(url_for("twitter.login"))
     formSubmitted = False
     try:
         if request.method == 'GET' and request.args:

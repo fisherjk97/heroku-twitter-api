@@ -146,7 +146,8 @@ def api_pictures():
             return render_template('api/pictures.html', formSubmitted=False, message = "")
     except:
         return render_template('api/pictures.html', formSubmitted=False, message="Oops! Too many requests. Please wait a few minutes and try again")
-    
+
+
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('error.html', error_message='uncaught exception'), 500
@@ -200,14 +201,14 @@ def get_accounts(response):
     response_dict = {}
     
     for a in accounts["users"]:
-        response_account = parse_account(a)
+        response_account = parse_account(a, False)
         response_dict[response_account.account_id] = response_account
 
     response_accounts = [ v for v in response_dict.values() ]
 
     return response_accounts
 
-def parse_account(account):
+def parse_account(account, oembed_enabled):
     if(account):
         account_id = account['id']
         screen_name = account['screen_name']
@@ -225,17 +226,22 @@ def parse_account(account):
         followers_count = account['followers_count']
 
         create_date = ""
+        oembed = ""
         if 'status' in account:
             tweet = account["status"]
             create_date = tweet['created_at']
+            if(oembed_enabled):
+                last_tweet_id = tweet['id']
+                oembed = get_tweet_oembed(last_tweet_id)
+
         
-        return Account(account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, create_date)
+        return Account(account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, create_date, oembed)
     else:
         return None
 
 def get_user_info(response):
     a = json.loads(response.content)
-    response_user = parse_account(a)
+    response_user = parse_account(a, True)
     return response_user
 
 
@@ -252,6 +258,26 @@ def get_user(user_id):
     url = show_user_url + '?user_id=' + user_id
     return twitter.get(url)
 
+
+def get_status(id):
+    queryString = "?id=" + str(id)
+    response = twitter.get("statuses/show.json" + queryString)
+    return response
+
+
+
+def get_tweet_oembed(id):
+    try:
+        url = "https://publish.twitter.com/oembed"
+        queryString = "?url=https://twitter.com/Interior/status/" + str(id)
+        response = twitter.get(url + queryString)
+        if(response.ok):
+            oembed = json.loads(response.content)
+            return oembed["html"]
+        else:
+            return ""
+    except:
+        return ""
  
 if __name__ == '__main__':
     app.run()

@@ -10,8 +10,9 @@ class Account():
     friends_count = 0
     followers_count = 0
     create_date = ""
+    oembed = ""
     
-    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, create_date):
+    def __init__(self, account_id, screen_name, name, description, profile_url, profile_image_url, profile_image_banner_url, friends_count, followers_count, create_date, oembed):
         self.account_id = account_id
         self.screen_name = screen_name
         self.name = name
@@ -23,6 +24,7 @@ class Account():
         self.friends_count = friends_count
         self.followers_count = followers_count
         self.create_date = create_date
+        self.oembed = oembed
 
     def __hash__(self):
         return hash(
@@ -35,7 +37,8 @@ class Account():
                 'profile_image_banner_url', self.profile_image_banner_url,
                 'friends_count', self.friends_count,
                 'followers_count',  self.followers_count,
-                'create_date', self.create_date
+                'create_date', self.create_date,
+                'oembed', self.oembed
                  ))
 
     def __eq__(self, other):

@@ -52,6 +52,9 @@
 			</div>
 			<div class="card-footer bg-white">
 				<small class="text-primary">Last tweeted {{user.create_date|datetime}}</small>
+				<div>
+					{{user.oembed|safe}}
+				</div>
 			  </div>
 		</div>
 		{% endif %}
